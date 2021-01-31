@@ -13,6 +13,13 @@ Authors     :   Yash Patel
 #include <stdint.h>
 
 // reference 6502 documentation: https://www.masswerk.at/6502/6502_instruction_set.html#PLP
+enum class AddressMode {
+	Immidiate,
+	Zeropage,
+	Absolute,
+	Indirect
+};
+
 class CPU {
 public:
 	CPU(uint8_t* memory);
@@ -31,62 +38,62 @@ private:
 	bool flagZero();
 	bool flagCarry();
 
-	void ADC();
-	void AND();
-	void ASL();
-	void BCC();
-	void BCS();
-	void BEQ();
-	void BIT();
-	void BMI();
-	void BNE();
-	void BPL();
-	void BRK();
-	void BVC();
-	void BVS();
-	void CLC();
-	void CLD();
-	void CLI();
-	void CLV();
-	void CMP();
-	void CPX();
-	void CPY();
-	void DEC();
-	void DEX();
-	void DEY();
-	void EOR();
-	void INC();
-	void INX();
-	void INY();
-	void JMP();
-	void JSR();
-	void LDA();
-	void LDX();
-	void LDY();
-	void LSR();
-	void NOP();
-	void ORA();
-	void PHA();
-	void PHP();
-	void PLA();
-	void PLP();
-	void ROL();
-	void ROR();
-	void RTI();
-	void RTS();
-	void SBC();
-	void SEC();
-	void SED();
-	void SEI();
-	void STA();
-	void STX();
-	void STY();
-	void TAX();
-	void TAY();
-	void TSX();
-	void TXA();
-	void TXS();
-	void TYA();
+    void ADC(uint16_t opcode);
+    void AND(uint16_t opcode);
+    void ASL(uint16_t opcode);
+    void BCC(uint16_t opcode);
+    void BCS(uint16_t opcode);
+    void BEQ(uint16_t opcode);
+    void BIT(uint16_t opcode);
+    void BMI(uint16_t opcode);
+    void BNE(uint16_t opcode);
+    void BPL(uint16_t opcode);
+    void BRK(uint16_t opcode);
+    void BVC(uint16_t opcode);
+    void BVS(uint16_t opcode);
+    void CLC(uint16_t opcode);
+    void CLD(uint16_t opcode);
+    void CLI(uint16_t opcode);
+    void CLV(uint16_t opcode);
+    void CMP(uint16_t opcode);
+    void CPX(uint16_t opcode);
+    void CPY(uint16_t opcode);
+    void DEC(uint16_t opcode);
+    void DEX(uint16_t opcode);
+    void DEY(uint16_t opcode);
+    void EOR(uint16_t opcode);
+    void INC(uint16_t opcode);
+    void INX(uint16_t opcode);
+    void INY(uint16_t opcode);
+    void JMP(uint16_t opcode);
+    void JSR(uint16_t opcode);
+    void LDA(uint16_t opcode);
+    void LDX(uint16_t opcode);
+    void LDY(uint16_t opcode);
+    void LSR(uint16_t opcode);
+    void NOP(uint16_t opcode);
+    void ORA(uint16_t opcode);
+    void PHA(uint16_t opcode);
+    void PHP(uint16_t opcode);
+    void PLA(uint16_t opcode);
+    void PLP(uint16_t opcode);
+    void ROL(uint16_t opcode);
+    void ROR(uint16_t opcode);
+    void RTI(uint16_t opcode);
+    void RTS(uint16_t opcode);
+    void SBC(uint16_t opcode);
+    void SEC(uint16_t opcode);
+    void SED(uint16_t opcode);
+    void SEI(uint16_t opcode);
+    void STA(uint16_t opcode);
+    void STX(uint16_t opcode);
+    void STY(uint16_t opcode);
+    void TAX(uint16_t opcode);
+    void TAY(uint16_t opcode);
+    void TSX(uint16_t opcode);
+    void TXA(uint16_t opcode);
+    void TXS(uint16_t opcode);
+    void TYA(uint16_t opcode);
 
 	uint8_t* memory;
 
