@@ -1,0 +1,14 @@
+﻿  main.cpp
+C:\Users\ypatel\Documents\nes\nes\nes\main.cpp(50,37): error C2665: 'std::chrono::duration<__int64,std::micro>::duration': none of the 3 overloads could convert all the argument types
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.24.28314\include\chrono(171,1): message : could be 'std::chrono::duration<__int64,std::micro>::duration(std::chrono::duration<__int64,std::micro> &&)'
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.24.28314\include\chrono(171,1): message : or       'std::chrono::duration<__int64,std::micro>::duration(const std::chrono::duration<__int64,std::micro> &)'
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.24.28314\include\chrono(75,9): message : or       'std::chrono::duration<__int64,std::micro>::duration(void)'
+C:\Users\ypatel\Documents\nes\nes\nes\main.cpp(50,37): message : while trying to match the argument list '(double)'
+C:\Users\ypatel\Documents\nes\nes\nes\main.cpp(53,89): error C2440: '<function-style-cast>': cannot convert from 'double' to 'std::chrono::microseconds'
+C:\Users\ypatel\Documents\nes\nes\nes\main.cpp(53,89): message : No constructor could take the source type, or constructor overload resolution was ambiguous
+C:\Users\ypatel\Documents\nes\nes\nes\main.cpp(59,117): error C2440: 'initializing': cannot convert from '_Rep' to 'std::chrono::duration<__int64,std::micro>'
+          with
+          [
+              _Rep=__int64
+          ]
+C:\Users\ypatel\Documents\nes\nes\nes\main.cpp(59,117): message : Constructor for class 'std::chrono::duration<__int64,std::micro>' is declared 'explicit'
