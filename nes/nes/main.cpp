@@ -37,6 +37,7 @@ find some of the components either not completed, broken, or both.
 
 *************************************************************************************/
 
+#include <conio.h>
 #include <iostream>
 #include <thread>
 #include <chrono>
@@ -45,6 +46,7 @@ find some of the components either not completed, broken, or both.
 
 int main() {
 	uint8_t memory[65536]; // 6502 has 16 address lines, meaning it can address 2^16 bytes
+
 	// TODO: load memory manually for now -- we will obviously load in actual ROMs in the end
 	memory[0x0600] = 0xa9;
 	memory[0x0601] = 0x01;
@@ -70,7 +72,7 @@ int main() {
 
 	char control; // just used for stepping for now
 	while (true) {
-		std::cin >> control;
+		control = _getch();
 		     if (control == ' ') { cpu.step(); }
 		else if (control == 'd') { cpu.dump(); }
 		else { continue; }

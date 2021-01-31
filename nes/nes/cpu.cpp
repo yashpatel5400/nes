@@ -1327,20 +1327,40 @@ void CPU::TYA(uint16_t opcode) { //transfer Y to accumulator
     }
 }
 
+const std::string separator = "----------------------------------";
+
+template<typename ... Args>
+std::string string_format(const std::string& format, Args ... args)
+{
+    int size = snprintf(nullptr, 0, format.c_str(), args ...) + 1; // Extra space for '\0'
+    if (size <= 0) { throw std::runtime_error("Error during formatting."); }
+    std::unique_ptr<char[]> buf(new char[size]);
+    snprintf(buf.get(), size, format.c_str(), args ...);
+    return std::string(buf.get(), buf.get() + size - 1); // We don't want the '\0' inside
+}
+
 template <typename T>
 void printHex(const std::string& name, T opcode) {
-    std::cout << name << " " << std::hex << std::setfill('0') << std::setw(2) << opcode << std::endl;
+    std::string opcodeStr = string_format("%04x", opcode);
+    const int centeringSpaces = (separator.size() - opcodeStr.size() - name.size() - 3) / 2;
+    const std::string centering(centeringSpaces, ' ');
+    std::cout << "[" << centering
+        << name << " " << std::hex << std::setfill('0') << std::setw(2) << opcodeStr
+        << centering << "]" << std::endl;
 }
 
 void CPU::dump() {
-    printHex("[OPC] opcode", opcode);
-    std::cout << "=========================" << std::endl;
-    printHex("[REG] rpc", rpc);
-    printHex("[REG] rac", rac);
-    printHex("[REG] rx", rx);
-    printHex("[REG] ry", ry);
-    printHex("[REG] rsr", rsr);
-    printHex("[REG] rsp", rsp);
+    std::cout << "[           6502 State           ]" << std::endl;
+    std::cout << separator << std::endl;
+    printHex("[OPC]", opcode);
+    std::cout << separator << std::endl;
+    printHex("[REG]PC", rpc);
+    printHex("[REG]AC", rac);
+    printHex("[REG] X", rx);
+    printHex("[REG] Y", ry);
+    printHex("[REG]SR", rsr);
+    printHex("[REG]SP", rsp);
+    std::cout << separator << std::endl;
 }
 
 void CPU::step() {
