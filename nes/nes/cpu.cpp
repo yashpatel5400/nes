@@ -78,6 +78,7 @@ void CPU::ADC(uint16_t opcode) { //add with carry
     case 0x79: break;
     case 0x61: break;
     case 0x71: break;
+    default: throw std::runtime_error("Incorrect dispatch: " + opcode);
     }
 }
 
@@ -101,6 +102,17 @@ AND  AND Memory with Accumulator
 
 *************************************************************************************/
 void CPU::AND(uint16_t opcode) { //and (with accumulator)
+    switch (opcode) {
+    case 0x29: break;
+    case 0x25: break;
+    case 0x35: break;
+    case 0x2D: break;
+    case 0x3D: break;
+    case 0x39: break;
+    case 0x21: break;
+    case 0x31: break;
+    default: throw std::runtime_error("Incorrect dispatch: " + opcode);
+    }
 }
 
 
@@ -121,6 +133,14 @@ ASL  Shift Left One Bit (Memory or Accumulator)
 
 *************************************************************************************/
 void CPU::ASL(uint16_t opcode) { //arithmetic shift left
+    switch (opcode) {
+    case 0x0A: break;
+    case 0x06: break;
+    case 0x16: break;
+    case 0x0E: break;
+    case 0x1E: break;
+    default: throw std::runtime_error("Incorrect dispatch: " + opcode);
+    }
 }
 
 /************************************************************************************
@@ -136,6 +156,10 @@ BCC  Branch on Carry Clear
 
 *************************************************************************************/
 void CPU::BCC(uint16_t opcode) { //branch on carry clear
+    switch (opcode) {
+    case 0x90: break;
+    default: throw std::runtime_error("Incorrect dispatch: " + opcode);
+    }
 }
 
 /************************************************************************************
@@ -151,6 +175,10 @@ BCS  Branch on Carry Set
 
 *************************************************************************************/
 void CPU::BCS(uint16_t opcode) { //branch on carry set
+    switch (opcode) {
+    case 0xB0: break;
+    default: throw std::runtime_error("Incorrect dispatch: " + opcode);
+    }
 }
 
 /************************************************************************************
@@ -166,6 +194,10 @@ BEQ  Branch on Result Zero
 
 *************************************************************************************/
 void CPU::BEQ(uint16_t opcode) { //branch on equal (zero set)
+    switch (opcode) {
+    case 0xF0: break;
+    default: throw std::runtime_error("Incorrect dispatch: " + opcode);
+    }
 }
 
 /************************************************************************************
@@ -185,6 +217,11 @@ BIT  Test Bits in Memory with Accumulator
 
 *************************************************************************************/
 void CPU::BIT(uint16_t opcode) { //bit test
+    switch (opcode) {
+    case 0x24: break;
+    case 0x2C: break;
+    default: throw std::runtime_error("Incorrect dispatch: " + opcode);
+    }
 }
 
 /************************************************************************************
@@ -200,6 +237,10 @@ BMI  Branch on Result Minus
 
 *************************************************************************************/
 void CPU::BMI(uint16_t opcode) { //branch on minus (negative set)
+    switch (opcode) {
+    case 0x30: break;
+    default: throw std::runtime_error("Incorrect dispatch: " + opcode);
+    }
 }
 
 /************************************************************************************
@@ -215,6 +256,10 @@ BNE  Branch on Result not Zero
 
 *************************************************************************************/
 void CPU::BNE(uint16_t opcode) { //branch on not equal (zero clear)
+    switch (opcode) {
+    case 0xD0: break;
+    default: throw std::runtime_error("Incorrect dispatch: " + opcode);
+    }
 }
 
 /************************************************************************************
@@ -230,6 +275,10 @@ BPL  Branch on Result Plus
 
 *************************************************************************************/
 void CPU::BPL(uint16_t opcode) { //branch on plus (negative clear)
+    switch (opcode) {
+    case 0x10: break;
+    default: throw std::runtime_error("Incorrect dispatch: " + opcode);
+    }
 }
 
 /************************************************************************************
@@ -245,6 +294,10 @@ BRK  Force Break
 
 *************************************************************************************/
 void CPU::BRK(uint16_t opcode) { //break / interrupt
+    switch (opcode) {
+    case 0x00: break;
+    default: throw std::runtime_error("Incorrect dispatch: " + opcode);
+    }
 }
 
 /************************************************************************************
@@ -260,6 +313,10 @@ BVC  Branch on Overflow Clear
 
 *************************************************************************************/
 void CPU::BVC(uint16_t opcode) { //branch on overflow clear
+    switch (opcode) {
+    case 0x50: break;
+    default: throw std::runtime_error("Incorrect dispatch: " + opcode);
+    }
 }
 
 /************************************************************************************
@@ -275,6 +332,10 @@ BVS  Branch on Overflow Set
 
 *************************************************************************************/
 void CPU::BVS(uint16_t opcode) { //branch on overflow set
+    switch (opcode) {
+    case 0x70: break;
+    default: throw std::runtime_error("Incorrect dispatch: " + opcode);
+    }
 }
 
 /************************************************************************************
@@ -290,6 +351,10 @@ CLC  Clear Carry Flag
 
 *************************************************************************************/
 void CPU::CLC(uint16_t opcode) { //clear carry
+    switch (opcode) {
+    case 0x18: break;
+    default: throw std::runtime_error("Incorrect dispatch: " + opcode);
+    }
 }
 
 /************************************************************************************
@@ -305,6 +370,10 @@ CLD  Clear Decimal Mode
 
 *************************************************************************************/
 void CPU::CLD(uint16_t opcode) { //clear decimal
+    switch (opcode) {
+    case 0xD8: break;
+    default: throw std::runtime_error("Incorrect dispatch: " + opcode);
+    }
 }
 
 /************************************************************************************
@@ -320,6 +389,10 @@ CLI  Clear Interrupt Disable Bit
 
 *************************************************************************************/
 void CPU::CLI(uint16_t opcode) { //clear interrupt disable
+    switch (opcode) {
+    case 0x58: break;
+    default: throw std::runtime_error("Incorrect dispatch: " + opcode);
+    }
 }
 
 /************************************************************************************
@@ -335,6 +408,10 @@ CLV  Clear Overflow Flag
 
 *************************************************************************************/
 void CPU::CLV(uint16_t opcode) { //clear overflow
+    switch (opcode) {
+    case 0xB8: break;
+    default: throw std::runtime_error("Incorrect dispatch: " + opcode);
+    }
 }
 
 /************************************************************************************
@@ -357,6 +434,17 @@ CMP  Compare Memory with Accumulator
 
 *************************************************************************************/
 void CPU::CMP(uint16_t opcode) { //compare (with accumulator)
+    switch (opcode) {
+    case 0xC9: break;
+    case 0xC5: break;
+    case 0xD5: break;
+    case 0xCD: break;
+    case 0xDD: break;
+    case 0xD9: break;
+    case 0xC1: break;
+    case 0xD1: break;
+    default: throw std::runtime_error("Incorrect dispatch: " + opcode);
+    }
 }
 
 /************************************************************************************
@@ -374,6 +462,12 @@ CPX  Compare Memory and Index X
 
 *************************************************************************************/
 void CPU::CPX(uint16_t opcode) { //compare with X
+    switch (opcode) {
+    case 0xE0: break;
+    case 0xE4: break;
+    case 0xEC: break;
+    default: throw std::runtime_error("Incorrect dispatch: " + opcode);
+    }
 }
 
 /************************************************************************************
@@ -391,6 +485,12 @@ CPY  Compare Memory and Index Y
 
 *************************************************************************************/
 void CPU::CPY(uint16_t opcode) { //compare with Y
+    switch (opcode) {
+    case 0xC0: break;
+    case 0xC4: break;
+    case 0xCC: break;
+    default: throw std::runtime_error("Incorrect dispatch: " + opcode);
+    }
 }
 
 /************************************************************************************
@@ -409,6 +509,13 @@ DEC  Decrement Memory by One
 
 *************************************************************************************/
 void CPU::DEC(uint16_t opcode) { //decrement
+    switch (opcode) {
+    case 0xC6: break;
+    case 0xD6: break;
+    case 0xCE: break;
+    case 0xDE: break;
+    default: throw std::runtime_error("Incorrect dispatch: " + opcode);
+    }
 }
 
 /************************************************************************************
@@ -424,6 +531,10 @@ DEX  Decrement Index X by One
 
 *************************************************************************************/
 void CPU::DEX(uint16_t opcode) { //decrement X
+    switch (opcode) {
+    case 0xCA: break;
+    default: throw std::runtime_error("Incorrect dispatch: " + opcode);
+    }
 }
 
 /************************************************************************************
@@ -439,6 +550,10 @@ DEY  Decrement Index Y by One
 
 *************************************************************************************/
 void CPU::DEY(uint16_t opcode) { //decrement Y
+    switch (opcode) {
+    case 0x88: break;
+    default: throw std::runtime_error("Incorrect dispatch: " + opcode);
+    }
 }
 
 /************************************************************************************
@@ -461,6 +576,17 @@ EOR  Exclusive-OR Memory with Accumulator
 
 *************************************************************************************/
 void CPU::EOR(uint16_t opcode) { //exclusive or (with accumulator)
+    switch (opcode) {
+    case 0x49: break;
+    case 0x45: break;
+    case 0x55: break;
+    case 0x4D: break;
+    case 0x5D: break;
+    case 0x59: break;
+    case 0x41: break;
+    case 0x51: break;
+    default: throw std::runtime_error("Incorrect dispatch: " + opcode);
+    }
 }
 
 /************************************************************************************
@@ -479,6 +605,13 @@ INC  Increment Memory by One
 
 *************************************************************************************/
 void CPU::INC(uint16_t opcode) { //increment
+    switch (opcode) {
+    case 0xE6: break;
+    case 0xF6: break;
+    case 0xEE: break;
+    case 0xFE: break;
+    default: throw std::runtime_error("Incorrect dispatch: " + opcode);
+    }
 }
 
 /************************************************************************************
@@ -494,6 +627,10 @@ INX  Increment Index X by One
 
 *************************************************************************************/
 void CPU::INX(uint16_t opcode) { //increment X
+    switch (opcode) {
+    case 0xE8: break;
+    default: throw std::runtime_error("Incorrect dispatch: " + opcode);
+    }
 }
 
 /************************************************************************************
@@ -509,6 +646,10 @@ INY  Increment Index Y by One
 
 *************************************************************************************/
 void CPU::INY(uint16_t opcode) { //increment Y
+    switch (opcode) {
+    case 0xC8: break;
+    default: throw std::runtime_error("Incorrect dispatch: " + opcode);
+    }
 }
 
 /************************************************************************************
@@ -525,6 +666,11 @@ JMP  Jump to New Location
 
 *************************************************************************************/
 void CPU::JMP(uint16_t opcode) { //jump
+    switch (opcode) {
+    case 0x4C: break;
+    case 0x6C: break;
+    default: throw std::runtime_error("Incorrect dispatch: " + opcode);
+    }
 }
 
 /************************************************************************************
@@ -541,6 +687,10 @@ JSR  Jump to New Location Saving Return Address
 
 *************************************************************************************/
 void CPU::JSR(uint16_t opcode) { //jump subroutine
+    switch (opcode) {
+    case 0x20: break;
+    default: throw std::runtime_error("Incorrect dispatch: " + opcode);
+    }
 }
 
 /************************************************************************************
@@ -563,6 +713,17 @@ LDA  Load Accumulator with Memory
 
 *************************************************************************************/
 void CPU::LDA(uint16_t opcode) { //load accumulator
+    switch (opcode) {
+    case 0xA9: break;
+    case 0xA5: break;
+    case 0xB5: break;
+    case 0xAD: break;
+    case 0xBD: break;
+    case 0xB9: break;
+    case 0xA1: break;
+    case 0xB1: break;
+    default: throw std::runtime_error("Incorrect dispatch: " + opcode);
+    }
 }
 
 /************************************************************************************
@@ -582,6 +743,14 @@ LDX  Load Index X with Memory
 
 *************************************************************************************/
 void CPU::LDX(uint16_t opcode) { //load X
+    switch (opcode) {
+    case 0xA2: break;
+    case 0xA6: break;
+    case 0xB6: break;
+    case 0xAE: break;
+    case 0xBE: break;
+    default: throw std::runtime_error("Incorrect dispatch: " + opcode);
+    }
 }
 
 /************************************************************************************
@@ -601,6 +770,14 @@ LDY  Load Index Y with Memory
 
 *************************************************************************************/
 void CPU::LDY(uint16_t opcode) { //load Y
+    switch (opcode) {
+    case 0xA0: break;
+    case 0xA4: break;
+    case 0xB4: break;
+    case 0xAC: break;
+    case 0xBC: break;
+    default: throw std::runtime_error("Incorrect dispatch: " + opcode);
+    }
 }
 
 /************************************************************************************
@@ -620,6 +797,14 @@ LSR  Shift One Bit Right (Memory or Accumulator)
 
 *************************************************************************************/
 void CPU::LSR(uint16_t opcode) { //logical shift right
+    switch (opcode) {
+    case 0x4A: break;
+    case 0x46: break;
+    case 0x56: break;
+    case 0x4E: break;
+    case 0x5E: break;
+    default: throw std::runtime_error("Incorrect dispatch: " + opcode);
+    }
 }
 
 /************************************************************************************
@@ -635,6 +820,10 @@ NOP  No Operation
 
 *************************************************************************************/
 void CPU::NOP(uint16_t opcode) { //no operation
+    switch (opcode) {
+    case 0xEA: break;
+    default: throw std::runtime_error("Incorrect dispatch: " + opcode);
+    }
 }
 
 /************************************************************************************
@@ -657,6 +846,17 @@ ORA  OR Memory with Accumulator
 
 *************************************************************************************/
 void CPU::ORA(uint16_t opcode) { //or with accumulator
+    switch (opcode) {
+    case 0x09: break;
+    case 0x05: break;
+    case 0x15: break;
+    case 0x0D: break;
+    case 0x1D: break;
+    case 0x19: break;
+    case 0x01: break;
+    case 0x11: break;
+    default: throw std::runtime_error("Incorrect dispatch: " + opcode);
+    }
 }
 
 /************************************************************************************
@@ -672,6 +872,10 @@ PHA  Push Accumulator on Stack
 
 *************************************************************************************/
 void CPU::PHA(uint16_t opcode) { //push accumulator
+    switch (opcode) {
+    case 0x48: break;
+    default: throw std::runtime_error("Incorrect dispatch: " + opcode);
+    }
 }
 
 /************************************************************************************
@@ -687,6 +891,10 @@ PHP  Push Processor Status on Stack
 
 *************************************************************************************/
 void CPU::PHP(uint16_t opcode) { //push processor status (SR)
+    switch (opcode) {
+    case 0x08: break;
+    default: throw std::runtime_error("Incorrect dispatch: " + opcode);
+    }
 }
 
 /************************************************************************************
@@ -702,6 +910,10 @@ PLA  Pull Accumulator from Stack
 
 *************************************************************************************/
 void CPU::PLA(uint16_t opcode) { //pull accumulator
+    switch (opcode) {
+    case 0x68: break;
+    default: throw std::runtime_error("Incorrect dispatch: " + opcode);
+    }
 }
 
 /************************************************************************************
@@ -717,6 +929,10 @@ PLP  Pull Processor Status from Stack
 
 *************************************************************************************/
 void CPU::PLP(uint16_t opcode) { //pull processor status (SR)
+    switch (opcode) {
+    case 0x28: break;
+    default: throw std::runtime_error("Incorrect dispatch: " + opcode);
+    }
 }
 
 /************************************************************************************
@@ -736,6 +952,14 @@ ROL  Rotate One Bit Left (Memory or Accumulator)
 
 *************************************************************************************/
 void CPU::ROL(uint16_t opcode) { //rotate left
+    switch (opcode) {
+    case 0x2A: break;
+    case 0x26: break;
+    case 0x36: break;
+    case 0x2E: break;
+    case 0x3E: break;
+    default: throw std::runtime_error("Incorrect dispatch: " + opcode);
+    }
 }
 
 /************************************************************************************
@@ -755,6 +979,14 @@ ROR  Rotate One Bit Right (Memory or Accumulator)
 
 *************************************************************************************/
 void CPU::ROR(uint16_t opcode) { //rotate right
+    switch (opcode) {
+    case 0x6A: break;
+    case 0x66: break;
+    case 0x76: break;
+    case 0x6E: break;
+    case 0x7E: break;
+    default: throw std::runtime_error("Incorrect dispatch: " + opcode);
+    }
 }
 
 /************************************************************************************
@@ -770,6 +1002,10 @@ RTI  Return from Interrupt
 
 *************************************************************************************/
 void CPU::RTI(uint16_t opcode) { //return from interrupt
+    switch (opcode) {
+    case 0x40: break;
+    default: throw std::runtime_error("Incorrect dispatch: " + opcode);
+    }
 }
 
 /************************************************************************************
@@ -785,6 +1021,10 @@ RTS  Return from Subroutine
 
 *************************************************************************************/
 void CPU::RTS(uint16_t opcode) { //return from subroutine
+    switch (opcode) {
+    case 0x60: break;
+    default: throw std::runtime_error("Incorrect dispatch: " + opcode);
+    }
 }
 
 /************************************************************************************
@@ -807,6 +1047,17 @@ SBC  Subtract Memory from Accumulator with Borrow
 
 *************************************************************************************/
 void CPU::SBC(uint16_t opcode) { //subtract with carry
+    switch (opcode) {
+    case 0xE9: break;
+    case 0xE5: break;
+    case 0xF5: break;
+    case 0xED: break;
+    case 0xFD: break;
+    case 0xF9: break;
+    case 0xE1: break;
+    case 0xF1: break;
+    default: throw std::runtime_error("Incorrect dispatch: " + opcode);
+    }
 }
 
 /************************************************************************************
@@ -822,6 +1073,10 @@ SEC  Set Carry Flag
 
 *************************************************************************************/
 void CPU::SEC(uint16_t opcode) { //set carry
+    switch (opcode) {
+    case 0x38: break;
+    default: throw std::runtime_error("Incorrect dispatch: " + opcode);
+    }
 }
 
 /************************************************************************************
@@ -837,6 +1092,10 @@ SED  Set Decimal Flag
 
 *************************************************************************************/
 void CPU::SED(uint16_t opcode) { //set decimal
+    switch (opcode) {
+    case 0xF8: break;
+    default: throw std::runtime_error("Incorrect dispatch: " + opcode);
+    }
 }
 
 /************************************************************************************
@@ -852,6 +1111,10 @@ SEI  Set Interrupt Disable Status
 
 *************************************************************************************/
 void CPU::SEI(uint16_t opcode) { //set interrupt disable
+    switch (opcode) {
+    case 0x78: break;
+    default: throw std::runtime_error("Incorrect dispatch: " + opcode);
+    }
 }
 
 /************************************************************************************
@@ -873,6 +1136,16 @@ STA  Store Accumulator in Memory
 
 *************************************************************************************/
 void CPU::STA(uint16_t opcode) { //store accumulator
+    switch (opcode) {
+    case 0x85: break;
+    case 0x95: break;
+    case 0x8D: break;
+    case 0x9D: break;
+    case 0x99: break;
+    case 0x81: break;
+    case 0x91: break;
+    default: throw std::runtime_error("Incorrect dispatch: " + opcode);
+    }
 }
 
 /************************************************************************************
@@ -890,6 +1163,12 @@ STX  Store Index X in Memory
 
 *************************************************************************************/
 void CPU::STX(uint16_t opcode) { //store X
+    switch (opcode) {
+    case 0x86: break;
+    case 0x96: break;
+    case 0x8E: break;
+    default: throw std::runtime_error("Incorrect dispatch: " + opcode);
+    }
 }
 
 /************************************************************************************
@@ -907,6 +1186,12 @@ STY  Store Index Y in Memory
 
 *************************************************************************************/
 void CPU::STY(uint16_t opcode) { //store Y
+    switch (opcode) {
+    case 0x84: break;
+    case 0x94: break;
+    case 0x8C: break;
+    default: throw std::runtime_error("Incorrect dispatch: " + opcode);
+    }
 }
 
 /************************************************************************************
@@ -922,6 +1207,10 @@ TAX  Transfer Accumulator to Index X
 
 *************************************************************************************/
 void CPU::TAX(uint16_t opcode) { //transfer accumulator to X
+    switch (opcode) {
+    case 0xAA: break;
+    default: throw std::runtime_error("Incorrect dispatch: " + opcode);
+    }
 }
 
 /************************************************************************************
@@ -937,6 +1226,10 @@ TAY  Transfer Accumulator to Index Y
 
 *************************************************************************************/
 void CPU::TAY(uint16_t opcode) { //transfer accumulator to Y
+    switch (opcode) {
+    case 0xA8: break;
+    default: throw std::runtime_error("Incorrect dispatch: " + opcode);
+    }
 }
 
 /************************************************************************************
@@ -952,6 +1245,10 @@ TSX  Transfer Stack Pointer to Index X
 
 *************************************************************************************/
 void CPU::TSX(uint16_t opcode) { //transfer stack pointer to X
+    switch (opcode) {
+    case 0xBA: break;
+    default: throw std::runtime_error("Incorrect dispatch: " + opcode);
+    }
 }
 
 /************************************************************************************
@@ -967,6 +1264,10 @@ TXA  Transfer Index X to Accumulator
 
 *************************************************************************************/
 void CPU::TXA(uint16_t opcode) { //transfer X to accumulator
+    switch (opcode) {
+    case 0x8A: break;
+    default: throw std::runtime_error("Incorrect dispatch: " + opcode);
+    }
 }
 
 /************************************************************************************
@@ -982,6 +1283,10 @@ TXS  Transfer Index X to Stack Register
 
 *************************************************************************************/
 void CPU::TXS(uint16_t opcode) { //transfer X to stack pointer
+    switch (opcode) {
+    case 0x9A: break;
+    default: throw std::runtime_error("Incorrect dispatch: " + opcode);
+    }
 }
 
 /************************************************************************************
@@ -997,6 +1302,10 @@ TYA  Transfer Index Y to Accumulator
 
 *************************************************************************************/
 void CPU::TYA(uint16_t opcode) { //transfer Y to accumulator
+    switch (opcode) {
+    case 0x98: break;
+    default: throw std::runtime_error("Incorrect dispatch: " + opcode);
+    }
 }
 
 void CPU::step() {
