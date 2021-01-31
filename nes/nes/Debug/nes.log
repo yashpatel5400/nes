@@ -1,6 +1,4 @@
 ﻿  cpu.cpp
-C:\Users\ypatel\Documents\nes\nes\nes\cpu.cpp(453,14): error C2039: 'runtime_error': is not a member of 'std'
-C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.24.28314\include\exception(214): message : see declaration of 'std'
-C:\Users\ypatel\Documents\nes\nes\nes\cpu.cpp(453,27): error C3861: 'runtime_error': identifier not found
   main.cpp
   Generating Code...
+  nes.vcxproj -> C:\Users\ypatel\Documents\nes\nes\Debug\nes.exe

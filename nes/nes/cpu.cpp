@@ -12,40 +12,59 @@ resource if you are interested in implementing the 6502 yourself (or understandi
 
 #include "CPU.h"
 
+#include <iomanip>
+#include <iostream>
 #include <stdexcept>
 
 CPU::CPU(uint8_t* memory) : memory(memory) {
+    rpc = 0xFFFC; // program counter starts 
+    rac = 0;  // accumulator (8 bit)
+    rx = 0;   // X register  (8 bit)
+    ry = 0;   // Y register  (8 bit)
+    rsr = 0;  // status register [NV-BDIZC]  (8 bit)
+    rsp = 0;  // stack pointer   (8 bit)
 }
 
-bool CPU::flagNegative() {
+/************************************************************************************
+
+SR Flags (bit 7 to bit 0):
+
+N	....	Negative
+V	....	Overflow
+-	....	ignored
+B	....	Break
+D	....	Decimal (use BCD for arithmetics)
+I	....	Interrupt (IRQ disable)
+Z	....	Zero
+C	....	Carry
+
+*************************************************************************************/
+
+bool CPU::srN() {
     return bool(rsr & 0b10000000);
 }
 
-bool CPU::flagOverflow() {
+bool CPU::srV() {
     return bool(rsr & 0b01000000);
 }
 
-bool CPU::flagignored() {
-    return bool(rsr & 0b00100000);
-}
-
-bool CPU::flagBreak() {
+bool CPU::srB() {
     return bool(rsr & 0b00010000);
 }
 
-bool CPU::flagDecimal() {
+bool CPU::srD() {
     return bool(rsr & 0b00001000);
 }
 
-bool CPU::flagInterrupt() {
+bool CPU::srI() {
     return bool(rsr & 0b00000100);
 }
 
-bool CPU::flagZero() {
+bool CPU::srZ() {
     return bool(rsr & 0b00000010);
 }
 
-bool CPU::flagCarry() {
+bool CPU::srC() {
     return bool(rsr & 0b00000001);
 }
 
@@ -1308,160 +1327,179 @@ void CPU::TYA(uint16_t opcode) { //transfer Y to accumulator
     }
 }
 
+template <typename T>
+void printHex(const std::string& name, T opcode) {
+    std::cout << name << " " << std::hex << std::setfill('0') << std::setw(2) << opcode << std::endl;
+}
+
+void CPU::dump() {
+    printHex("[OPC] opcode", opcode);
+    std::cout << "=========================" << std::endl;
+    printHex("[REG] rpc", rpc);
+    printHex("[REG] rac", rac);
+    printHex("[REG] rx", rx);
+    printHex("[REG] ry", ry);
+    printHex("[REG] rsr", rsr);
+    printHex("[REG] rsp", rsp);
+}
+
 void CPU::step() {
-    uint16_t opcode;
+    uint8_t byte = memory[rpc++];
+
+    opcode = ((opcode & 0xFF00) | byte) | (opcode >> 8);
+
     switch (opcode) {
-    case 0x00: break;
-    case 0x01: break;
-    case 0x05: break;
-    case 0x06: break;
-    case 0x08: break;
-    case 0x09: break;
-    case 0x0A: break;
-    case 0x0D: break;
-    case 0x0E: break;
-    case 0x10: break;
-    case 0x11: break;
-    case 0x15: break;
-    case 0x16: break;
-    case 0x18: break;
-    case 0x19: break;
-    case 0x1D: break;
-    case 0x1E: break;
-    case 0x20: break;
-    case 0x21: break;
-    case 0x24: break;
-    case 0x25: break;
-    case 0x26: break;
-    case 0x28: break;
-    case 0x29: break;
-    case 0x2A: break;
-    case 0x2C: break;
-    case 0x2D: break;
-    case 0x2E: break;
-    case 0x30: break;
-    case 0x31: break;
-    case 0x35: break;
-    case 0x36: break;
-    case 0x38: break;
-    case 0x39: break;
-    case 0x3D: break;
-    case 0x3E: break;
-    case 0x40: break;
-    case 0x41: break;
-    case 0x45: break;
-    case 0x46: break;
-    case 0x48: break;
-    case 0x49: break;
-    case 0x4A: break;
-    case 0x4C: break;
-    case 0x4D: break;
-    case 0x4E: break;
-    case 0x50: break;
-    case 0x51: break;
-    case 0x55: break;
-    case 0x56: break;
-    case 0x58: break;
-    case 0x59: break;
-    case 0x5D: break;
-    case 0x5E: break;
-    case 0x60: break;
-    case 0x61: break;
-    case 0x65: break;
-    case 0x66: break;
-    case 0x68: break;
-    case 0x69: break;
-    case 0x6A: break;
-    case 0x6C: break;
-    case 0x6D: break;
-    case 0x6E: break;
-    case 0x70: break;
-    case 0x71: break;
-    case 0x75: break;
-    case 0x76: break;
-    case 0x78: break;
-    case 0x79: break;
-    case 0x7D: break;
-    case 0x7E: break;
-    case 0x81: break;
-    case 0x84: break;
-    case 0x85: break;
-    case 0x86: break;
-    case 0x88: break;
-    case 0x8A: break;
-    case 0x8C: break;
-    case 0x8D: break;
-    case 0x8E: break;
-    case 0x90: break;
-    case 0x91: break;
-    case 0x94: break;
-    case 0x95: break;
-    case 0x96: break;
-    case 0x98: break;
-    case 0x99: break;
-    case 0x9A: break;
-    case 0x9D: break;
-    case 0xA0: break;
-    case 0xA1: break;
-    case 0xA2: break;
-    case 0xA4: break;
-    case 0xA5: break;
-    case 0xA6: break;
-    case 0xA8: break;
-    case 0xA9: break;
-    case 0xAA: break;
-    case 0xAC: break;
-    case 0xAD: break;
-    case 0xAE: break;
-    case 0xB0: break;
-    case 0xB1: break;
-    case 0xB4: break;
-    case 0xB5: break;
-    case 0xB6: break;
-    case 0xB8: break;
-    case 0xB9: break;
-    case 0xBA: break;
-    case 0xBC: break;
-    case 0xBD: break;
-    case 0xBE: break;
-    case 0xC0: break;
-    case 0xC1: break;
-    case 0xC4: break;
-    case 0xC5: break;
-    case 0xC6: break;
-    case 0xC8: break;
-    case 0xC9: break;
-    case 0xCA: break;
-    case 0xCC: break;
-    case 0xCD: break;
-    case 0xCE: break;
-    case 0xD0: break;
-    case 0xD1: break;
-    case 0xD5: break;
-    case 0xD6: break;
-    case 0xD8: break;
-    case 0xD9: break;
-    case 0xDD: break;
-    case 0xDE: break;
-    case 0xE0: break;
-    case 0xE1: break;
-    case 0xE4: break;
-    case 0xE5: break;
-    case 0xE6: break;
-    case 0xE8: break;
-    case 0xE9: break;
-    case 0xEA: break;
-    case 0xEC: break;
-    case 0xED: break;
-    case 0xEE: break;
-    case 0xF0: break;
-    case 0xF1: break;
-    case 0xF5: break;
-    case 0xF6: break;
-    case 0xF8: break;
-    case 0xF9: break;
-    case 0xFD: break;
-    case 0xFE: break;
+    case 0x00: BRK(opcode); break;
+    case 0x01: ORA(opcode); break;
+    case 0x05: ORA(opcode); break;
+    case 0x06: ASL(opcode); break;
+    case 0x08: PHP(opcode); break;
+    case 0x09: ORA(opcode); break;
+    case 0x0A: ASL(opcode); break;
+    case 0x0D: ORA(opcode); break;
+    case 0x0E: ASL(opcode); break;
+    case 0x10: BPL(opcode); break;
+    case 0x11: ORA(opcode); break;
+    case 0x15: ORA(opcode); break;
+    case 0x16: ASL(opcode); break;
+    case 0x18: CLC(opcode); break;
+    case 0x19: ORA(opcode); break;
+    case 0x1D: ORA(opcode); break;
+    case 0x1E: ASL(opcode); break;
+    case 0x20: JSR(opcode); break;
+    case 0x21: AND(opcode); break;
+    case 0x24: BIT(opcode); break;
+    case 0x25: AND(opcode); break;
+    case 0x26: ROL(opcode); break;
+    case 0x28: PLP(opcode); break;
+    case 0x29: AND(opcode); break;
+    case 0x2A: ROL(opcode); break;
+    case 0x2C: BIT(opcode); break;
+    case 0x2D: AND(opcode); break;
+    case 0x2E: ROL(opcode); break;
+    case 0x30: BMI(opcode); break;
+    case 0x31: AND(opcode); break;
+    case 0x35: AND(opcode); break;
+    case 0x36: ROL(opcode); break;
+    case 0x38: SEC(opcode); break;
+    case 0x39: AND(opcode); break;
+    case 0x3D: AND(opcode); break;
+    case 0x3E: ROL(opcode); break;
+    case 0x40: RTI(opcode); break;
+    case 0x41: EOR(opcode); break;
+    case 0x45: EOR(opcode); break;
+    case 0x46: LSR(opcode); break;
+    case 0x48: PHA(opcode); break;
+    case 0x49: EOR(opcode); break;
+    case 0x4A: LSR(opcode); break;
+    case 0x4C: JMP(opcode); break;
+    case 0x4D: EOR(opcode); break;
+    case 0x4E: LSR(opcode); break;
+    case 0x50: BVC(opcode); break;
+    case 0x51: EOR(opcode); break;
+    case 0x55: EOR(opcode); break;
+    case 0x56: LSR(opcode); break;
+    case 0x58: CLI(opcode); break;
+    case 0x59: EOR(opcode); break;
+    case 0x5D: EOR(opcode); break;
+    case 0x5E: LSR(opcode); break;
+    case 0x60: RTS(opcode); break;
+    case 0x61: ADC(opcode); break;
+    case 0x65: ADC(opcode); break;
+    case 0x66: ROR(opcode); break;
+    case 0x68: PLA(opcode); break;
+    case 0x69: ADC(opcode); break;
+    case 0x6A: ROR(opcode); break;
+    case 0x6C: JMP(opcode); break;
+    case 0x6D: ADC(opcode); break;
+    case 0x6E: ROR(opcode); break;
+    case 0x70: BVS(opcode); break;
+    case 0x71: ADC(opcode); break;
+    case 0x75: ADC(opcode); break;
+    case 0x76: ROR(opcode); break;
+    case 0x78: SEI(opcode); break;
+    case 0x79: ADC(opcode); break;
+    case 0x7D: ADC(opcode); break;
+    case 0x7E: ROR(opcode); break;
+    case 0x81: STA(opcode); break;
+    case 0x84: STY(opcode); break;
+    case 0x85: STA(opcode); break;
+    case 0x86: STX(opcode); break;
+    case 0x88: DEY(opcode); break;
+    case 0x8A: TXA(opcode); break;
+    case 0x8C: STY(opcode); break;
+    case 0x8D: STA(opcode); break;
+    case 0x8E: STX(opcode); break;
+    case 0x90: BCC(opcode); break;
+    case 0x91: STA(opcode); break;
+    case 0x94: STY(opcode); break;
+    case 0x95: STA(opcode); break;
+    case 0x96: STX(opcode); break;
+    case 0x98: TYA(opcode); break;
+    case 0x99: STA(opcode); break;
+    case 0x9A: TXS(opcode); break;
+    case 0x9D: STA(opcode); break;
+    case 0xA0: LDY(opcode); break;
+    case 0xA1: LDA(opcode); break;
+    case 0xA2: LDX(opcode); break;
+    case 0xA4: LDY(opcode); break;
+    case 0xA5: LDA(opcode); break;
+    case 0xA6: LDX(opcode); break;
+    case 0xA8: TAY(opcode); break;
+    case 0xA9: LDA(opcode); break;
+    case 0xAA: TAX(opcode); break;
+    case 0xAC: LDY(opcode); break;
+    case 0xAD: LDA(opcode); break;
+    case 0xAE: LDX(opcode); break;
+    case 0xB0: BCS(opcode); break;
+    case 0xB1: LDA(opcode); break;
+    case 0xB4: LDY(opcode); break;
+    case 0xB5: LDA(opcode); break;
+    case 0xB6: LDX(opcode); break;
+    case 0xB8: CLV(opcode); break;
+    case 0xB9: LDA(opcode); break;
+    case 0xBA: TSX(opcode); break;
+    case 0xBC: LDY(opcode); break;
+    case 0xBD: LDA(opcode); break;
+    case 0xBE: LDX(opcode); break;
+    case 0xC0: CPY(opcode); break;
+    case 0xC1: CMP(opcode); break;
+    case 0xC4: CPY(opcode); break;
+    case 0xC5: CMP(opcode); break;
+    case 0xC6: DEC(opcode); break;
+    case 0xC8: INY(opcode); break;
+    case 0xC9: CMP(opcode); break;
+    case 0xCA: DEX(opcode); break;
+    case 0xCC: CPY(opcode); break;
+    case 0xCD: CMP(opcode); break;
+    case 0xCE: DEC(opcode); break;
+    case 0xD0: BNE(opcode); break;
+    case 0xD1: CMP(opcode); break;
+    case 0xD5: CMP(opcode); break;
+    case 0xD6: DEC(opcode); break;
+    case 0xD8: CLD(opcode); break;
+    case 0xD9: CMP(opcode); break;
+    case 0xDD: CMP(opcode); break;
+    case 0xDE: DEC(opcode); break;
+    case 0xE0: CPX(opcode); break;
+    case 0xE1: SBC(opcode); break;
+    case 0xE4: CPX(opcode); break;
+    case 0xE5: SBC(opcode); break;
+    case 0xE6: INC(opcode); break;
+    case 0xE8: INX(opcode); break;
+    case 0xE9: SBC(opcode); break;
+    case 0xEA: NOP(opcode); break;
+    case 0xEC: CPX(opcode); break;
+    case 0xED: SBC(opcode); break;
+    case 0xEE: INC(opcode); break;
+    case 0xF0: BEQ(opcode); break;
+    case 0xF1: SBC(opcode); break;
+    case 0xF5: SBC(opcode); break;
+    case 0xF6: INC(opcode); break;
+    case 0xF8: SED(opcode); break;
+    case 0xF9: SBC(opcode); break;
+    case 0xFD: SBC(opcode); break;
+    case 0xFE: INC(opcode); break;
     default:
         throw std::runtime_error("Unexpected opcode: " + opcode);
     }

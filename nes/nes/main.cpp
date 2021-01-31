@@ -45,10 +45,35 @@ find some of the components either not completed, broken, or both.
 
 int main() {
 	uint8_t memory[65536]; // 6502 has 16 address lines, meaning it can address 2^16 bytes
+	// TODO: load memory manually for now -- we will obviously load in actual ROMs in the end
+	memory[0x0600] = 0xa9;
+	memory[0x0601] = 0x01;
+	memory[0x0602] = 0x8d;
+	memory[0x0603] = 0x00;
+	memory[0x0604] = 0x02;
+	memory[0x0605] = 0xa9;
+	memory[0x0606] = 0x05;
+	memory[0x0607] = 0x8d;
+	memory[0x0608] = 0x01;
+	memory[0x0609] = 0x02;
+	memory[0x060A] = 0xa9;
+	memory[0x060B] = 0x08;
+	memory[0x060C] = 0x8d;
+	memory[0x060D] = 0x02;
+	memory[0x060E] = 0x02;
+
+	// 6502 has a reset vector of FFFC and FFFD and also is little endian ==> 00 60 is 0x6000
+	memory[0xFFFC] = 0x00;
+	memory[0xFFFD] = 0x60;
+
 	CPU cpu(memory);
 
+	char control; // just used for stepping for now
 	while (true) {
-		cpu.step();
+		std::cin >> control;
+		     if (control == ' ') { cpu.step(); }
+		else if (control == 'd') { cpu.dump(); }
+		else { continue; }
 	}
 
 	return 0;

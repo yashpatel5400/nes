@@ -26,17 +26,17 @@ public:
 	~CPU() = default;
 
 	void step();
+    void dump(); // dumps state (just used for debugging purposes)
 
 private: 
 	// SR Flags (bit 7 to bit 0) carry different semantics -- functions to disentangle
-	bool flagNegative();
-	bool flagOverflow();
-	bool flagignored();
-	bool flagBreak();
-	bool flagDecimal();
-	bool flagInterrupt();
-	bool flagZero();
-	bool flagCarry();
+    bool srN();
+    bool srV();
+    bool srB();
+    bool srD();
+    bool srI();
+    bool srZ();
+    bool srC();
 
     void ADC(uint16_t opcode);
     void AND(uint16_t opcode);
@@ -97,6 +97,7 @@ private:
 
 	uint8_t* memory;
 
+    uint16_t opcode;
 	uint16_t rpc; // program counter (16 bit)
 	uint8_t rac;  // accumulator (8 bit)
 	uint8_t rx;   // X register  (8 bit)
