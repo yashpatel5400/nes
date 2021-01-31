@@ -16,8 +16,13 @@ resource if you are interested in implementing the 6502 yourself (or understandi
 #include <iostream>
 #include <stdexcept>
 
+uint16_t CPU::readShort(uint16_t addr) {
+    uint16_t higher = memory[addr+1];
+    return (higher << 8) | memory[addr]; // program counter starts 
+}
+
 CPU::CPU(uint8_t* memory) : memory(memory) {
-    rpc = 0xFFFC; // program counter starts 
+    rpc = readShort(0xFFFC); // program counter starts w/ value at FFFC
     rac = 0;  // accumulator (8 bit)
     rx = 0;   // X register  (8 bit)
     ry = 0;   // Y register  (8 bit)
@@ -89,7 +94,11 @@ ADC  Add Memory to Accumulator with Carry
 *************************************************************************************/
 void CPU::ADC(uint16_t opcode) { //add with carry
     switch (opcode) {
-    case 0x69: break;
+    case 0x69: {
+        uint16_t arg = readShort(rpc);
+        rpc += 2;
+        break;
+    }
     case 0x65: break;
     case 0x75: break;
     case 0x6D: break;
@@ -1364,9 +1373,9 @@ void CPU::dump() {
 }
 
 void CPU::step() {
-    uint8_t rawByte = memory[rpc++];
-    uint16_t byte = rawByte; // need to reassign to allow shift
-    opcode = (byte << 8) | (opcode >> 8);
+    uint8_t opcode = memory[rpc++];
+//    uint16_t byte = rawByte; // need to reassign to allow shift
+//    opcode = (byte << 8) | (opcode >> 8);
 
     switch (opcode) {
     case 0x00: BRK(opcode); break;
@@ -1521,6 +1530,6 @@ void CPU::step() {
     case 0xFD: SBC(opcode); break;
     case 0xFE: INC(opcode); break;
     default:
-        throw std::runtime_error("Unexpected opcode: " + opcode);
+        std::cout << "Unexpected opcode: " << opcode << std::endl;
     }
 }

@@ -95,6 +95,8 @@ private:
     void TXS(uint16_t opcode);
     void TYA(uint16_t opcode);
 
+    uint16_t readShort(uint16_t addr);
+
 	uint8_t* memory;
 
     uint16_t opcode;
