@@ -13,10 +13,10 @@ Authors     :   Yash Patel
 #include <stdint.h>
 
 // reference 6502 documentation: https://www.masswerk.at/6502/6502_instruction_set.html#PLP
-class Cpu {
+class CPU {
 public:
-	Cpu(uint8_t* memory);
-	~Cpu() = default;
+	CPU(uint8_t* memory);
+	~CPU() = default;
 
 	void step();
 
@@ -30,6 +30,63 @@ private:
 	bool flagInterrupt();
 	bool flagZero();
 	bool flagCarry();
+
+	void ADC();
+	void AND();
+	void ASL();
+	void BCC();
+	void BCS();
+	void BEQ();
+	void BIT();
+	void BMI();
+	void BNE();
+	void BPL();
+	void BRK();
+	void BVC();
+	void BVS();
+	void CLC();
+	void CLD();
+	void CLI();
+	void CLV();
+	void CMP();
+	void CPX();
+	void CPY();
+	void DEC();
+	void DEX();
+	void DEY();
+	void EOR();
+	void INC();
+	void INX();
+	void INY();
+	void JMP();
+	void JSR();
+	void LDA();
+	void LDX();
+	void LDY();
+	void LSR();
+	void NOP();
+	void ORA();
+	void PHA();
+	void PHP();
+	void PLA();
+	void PLP();
+	void ROL();
+	void ROR();
+	void RTI();
+	void RTS();
+	void SBC();
+	void SEC();
+	void SED();
+	void SEI();
+	void STA();
+	void STX();
+	void STY();
+	void TAX();
+	void TAY();
+	void TSX();
+	void TXA();
+	void TXS();
+	void TYA();
 
 	uint8_t* memory;
 

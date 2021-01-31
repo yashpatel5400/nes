@@ -45,7 +45,7 @@ find some of the components either not completed, broken, or both.
 
 int main() {
 	uint8_t memory[65536]; // 6502 has 16 address lines, meaning it can address 2^16 bytes
-	Cpu cpu(memory);
+	CPU cpu(memory);
 
 	while (true) {
 		cpu.step();
