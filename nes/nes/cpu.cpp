@@ -1364,9 +1364,9 @@ void CPU::dump() {
 }
 
 void CPU::step() {
-    uint8_t byte = memory[rpc++];
-
-    opcode = ((opcode & 0xFF00) | byte) | (opcode >> 8);
+    uint8_t rawByte = memory[rpc++];
+    uint16_t byte = rawByte; // need to reassign to allow shift
+    opcode = (byte << 8) | (opcode >> 8);
 
     switch (opcode) {
     case 0x00: BRK(opcode); break;

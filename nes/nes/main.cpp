@@ -45,7 +45,9 @@ find some of the components either not completed, broken, or both.
 #include "cpu.h"
 
 int main() {
-	uint8_t memory[65536]; // 6502 has 16 address lines, meaning it can address 2^16 bytes
+	const int kMemorySize = 65536;
+	uint8_t memory[kMemorySize]; // 6502 has 16 address lines, meaning it can address 2^16 bytes
+	std::fill(memory, memory + kMemorySize, 0x00);
 
 	// TODO: load memory manually for now -- we will obviously load in actual ROMs in the end
 	memory[0x0600] = 0xa9;
