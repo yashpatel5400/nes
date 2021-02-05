@@ -17,8 +17,9 @@ resource if you are interested in implementing the 6502 yourself (or understandi
 #include <stdexcept>
 
 uint16_t CPU::readShort(uint16_t addr) {
-    uint16_t higher = memory[addr+1];
-    return (higher << 8) | memory[addr]; // program counter starts 
+    uint16_t ll = memory[rpc++];
+    uint16_t hh = memory[rpc++];
+    return (hh << 8) | ll;
 }
 
 CPU::CPU(uint8_t* memory) : memory(memory) {
@@ -95,6 +96,63 @@ zpg,Y	....	zeropage, Y-indexed	 	OPC $LL,Y	 	operand is zeropage address; effect
 
 
 *************************************************************************************/
+
+uint8_t CPU::operandAcc() {
+    return rac;
+}
+
+uint8_t CPU::operandAbs() {
+    uint16_t operand = readShort(rpc);
+    return operand;
+}
+
+uint8_t CPU::operandAbsX() {
+    uint16_t operand = readShort(rpc);
+    return operand + rx;
+}
+
+uint8_t CPU::operandAbsY() {
+    uint16_t operand = readShort(rpc);
+    return operand + ry;
+}
+
+uint8_t CPU::operandImm() {
+    return memory[rpc++];
+}
+
+uint8_t CPU::operandInd() {
+    uint16_t ll = memory[rpc++];
+    uint16_t hh = memory[rpc++];
+    return (hh << 8) | ll;
+}
+
+uint8_t CPU::operandIndX() {
+    
+}
+
+uint8_t CPU::operandIndY() {
+    
+}
+
+uint8_t CPU::operandRelative() {
+    return 0;
+}
+
+uint8_t CPU::operandZpg() {
+    return memory[rpc++];
+}
+
+uint8_t CPU::operandZpgX() {
+    uint8_t loc = rpc + rx;
+    rpc++;
+    return memory[loc];
+}
+
+uint8_t CPU::operandZpgX() {
+    uint8_t loc = rpc + ry;
+    rpc++;
+    return memory[loc];
+}
 
 /************************************************************************************
 

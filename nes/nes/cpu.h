@@ -38,6 +38,19 @@ private:
     bool srZ();
     bool srC();
 
+    uint8_t operandAcc();
+    uint8_t operandAbs();
+    uint8_t operandAbsX();
+    uint8_t operandAbsY();
+    uint8_t operandImm();
+    uint8_t operandInd();
+    uint8_t operandIndX();
+    uint8_t operandIndY();
+    uint8_t operandRelative();
+    uint8_t operandZpg();
+    uint8_t operandZpgX();
+    uint8_t operandZpgX();
+
     void ADC(uint16_t opcode);
     void AND(uint16_t opcode);
     void ASL(uint16_t opcode);
