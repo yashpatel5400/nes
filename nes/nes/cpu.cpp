@@ -553,7 +553,7 @@ CLC  Clear Carry Flag
 *************************************************************************************/
 void CPU::CLC(uint16_t opcode) { //clear carry
     switch (opcode) {
-    case 0x18: break;
+    case 0x18: { setStatusC(false); rpc++; break; }
     default: throw std::runtime_error("Incorrect dispatch: " + opcode);
     }
 }
@@ -572,7 +572,7 @@ CLD  Clear Decimal Mode
 *************************************************************************************/
 void CPU::CLD(uint16_t opcode) { //clear decimal
     switch (opcode) {
-    case 0xD8: break;
+    case 0xD8: { setStatusD(false); rpc++; break; }
     default: throw std::runtime_error("Incorrect dispatch: " + opcode);
     }
 }
@@ -591,7 +591,7 @@ CLI  Clear Interrupt Disable Bit
 *************************************************************************************/
 void CPU::CLI(uint16_t opcode) { //clear interrupt disable
     switch (opcode) {
-    case 0x58: break;
+    case 0x58: { setStatusI(false); rpc++; break; }
     default: throw std::runtime_error("Incorrect dispatch: " + opcode);
     }
 }
@@ -610,7 +610,7 @@ CLV  Clear Overflow Flag
 *************************************************************************************/
 void CPU::CLV(uint16_t opcode) { //clear overflow
     switch (opcode) {
-    case 0xB8: break;
+    case 0xB8: { setStatusV(false); rpc++; break; }
     default: throw std::runtime_error("Incorrect dispatch: " + opcode);
     }
 }
