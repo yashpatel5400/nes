@@ -39,11 +39,11 @@ private:
     bool srC();
 
     uint8_t operandAcc();
-    uint8_t operandAbs();
-    uint8_t operandAbsX();
-    uint8_t operandAbsY();
+    uint16_t operandAbs();
+    uint16_t operandAbsX();
+    uint16_t operandAbsY();
     uint8_t operandImm();
-    uint8_t operandInd();
+    uint16_t operandInd();
     uint8_t operandIndX();
     uint8_t operandIndY();
     uint8_t operandRelative();

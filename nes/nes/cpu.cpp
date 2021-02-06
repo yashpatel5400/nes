@@ -101,37 +101,39 @@ uint8_t CPU::operandAcc() {
     return rac;
 }
 
-uint8_t CPU::operandAbs() {
-    uint16_t operand = readShort(rpc);
-    return operand;
+uint16_t CPU::operandAbs() {
+    uint16_t hhll = readShort(rpc);
+    return hhll;
 }
 
-uint8_t CPU::operandAbsX() {
-    uint16_t operand = readShort(rpc);
-    return operand + rx;
+uint16_t CPU::operandAbsX() {
+    uint16_t hhll = readShort(rpc);
+    return hhll + rx;
 }
 
-uint8_t CPU::operandAbsY() {
-    uint16_t operand = readShort(rpc);
-    return operand + ry;
+uint16_t CPU::operandAbsY() {
+    uint16_t hhll = readShort(rpc);
+    return hhll + ry;
 }
 
 uint8_t CPU::operandImm() {
-    return memory[rpc++];
+    uint8_t bb = memory[rpc++];
+    return bb;
 }
 
-uint8_t CPU::operandInd() {
-    uint16_t ll = memory[rpc++];
-    uint16_t hh = memory[rpc++];
-    return (hh << 8) | ll;
+uint16_t CPU::operandInd() {
+    uint16_t hhll = readShort(rpc);
+    return memory[hhll];
 }
 
 uint8_t CPU::operandIndX() {
-    
+    uint16_t ll = memory[rpc++];
+    return memory[ll + rx];
 }
 
 uint8_t CPU::operandIndY() {
-    
+    uint16_t ll = memory[rpc++];
+    return memory[ll] + ry;
 }
 
 uint8_t CPU::operandRelative() {
@@ -139,19 +141,18 @@ uint8_t CPU::operandRelative() {
 }
 
 uint8_t CPU::operandZpg() {
-    return memory[rpc++];
+    uint16_t ll = memory[rpc++];
+    return ll;
 }
 
 uint8_t CPU::operandZpgX() {
-    uint8_t loc = rpc + rx;
-    rpc++;
-    return memory[loc];
+    uint16_t ll = memory[rpc++];
+    return ll + rx;
 }
 
 uint8_t CPU::operandZpgX() {
-    uint8_t loc = rpc + ry;
-    rpc++;
-    return memory[loc];
+    uint16_t ll = memory[rpc++];
+    return ll + ry;
 }
 
 /************************************************************************************
@@ -174,45 +175,37 @@ ADC  Add Memory to Accumulator with Carry
 
 *************************************************************************************/
 void CPU::ADC(uint16_t opcode) { //add with carry
-    uint8_t oper = memory[rpc++];
-
     switch (opcode) {
     case 0x69: {
-        rac += oper;
+        rac += operandAbs();
         break;
     }
     case 0x65: {
-        rac += memory[oper];
+        rac += operandZpg();
         break;
     }
     case 0x75: {
-        rac += memory[oper + rx];
+        rac += operandZpgX();
         break;
     }
     case 0x6D: {
-        rpc++;
-        uint16_t operand = readShort(rpc - 2);
-        rac += memory[operand];
+        rac += operandAbs();
         break;
     }
     case 0x7D: {
-        rpc++;
-        uint16_t operand = readShort(rpc - 2);
-        rac += memory[operand + rx];
+        rac += operandAbsX();
         break;
     }
     case 0x79: {
-        rpc++;
-        uint16_t operand = readShort(rpc - 2);
-        rac += memory[operand + ry];
+        rac += operandAbsY();
         break;
     }
     case 0x61: {
-        rac += memory[oper];
+        rac += operandIndX();
         break;
     }
     case 0x71: {
-        rac += memory[oper];
+        rac += operandIndY();
         break;
     }
     default: throw std::runtime_error("Incorrect dispatch: " + opcode);
