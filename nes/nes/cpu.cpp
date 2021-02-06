@@ -25,8 +25,8 @@ uint16_t CPU::readShort(uint16_t addr) {
 CPU::CPU(uint8_t* memory) : memory(memory) {
     rpc = readShort(0xFFFC); // program counter starts w/ value at FFFC
     rac = 0;  // accumulator (8 bit)
-    rx = 0;   // X register  (8 bit)
-    ry = 0;   // Y register  (8 bit)
+    rx  = 0;   // X register  (8 bit)
+    ry  = 0;   // Y register  (8 bit)
     rsr = 0;  // status register [NV-BDIZC]  (8 bit)
     rsp = 0;  // stack pointer   (8 bit)
 }
@@ -76,6 +76,8 @@ bool CPU::srC() {
 
 /************************************************************************************
 
+NOTE: The 6502 has 16 address lines, meaning it has a 16-bit addressable space, which
+is why all these helper methods for determining the address locations are uint16_t.
 Helper methods for memory access that are used repeatedly throughout the code:
 
 Address Modes:
@@ -97,7 +99,7 @@ zpg,Y	....	zeropage, Y-indexed	 	OPC $LL,Y	 	operand is zeropage address; effect
 
 *************************************************************************************/
 
-uint8_t CPU::operandAcc() {
+uint16_t CPU::operandAcc() {
     return rac;
 }
 
@@ -116,7 +118,7 @@ uint16_t CPU::operandAbsY() {
     return hhll + ry;
 }
 
-uint8_t CPU::operandImm() {
+uint16_t CPU::operandImm() {
     uint8_t bb = memory[rpc++];
     return bb;
 }
@@ -126,31 +128,31 @@ uint16_t CPU::operandInd() {
     return memory[hhll];
 }
 
-uint8_t CPU::operandIndX() {
+uint16_t CPU::operandIndX() {
     uint16_t ll = memory[rpc++];
     return memory[ll + rx];
 }
 
-uint8_t CPU::operandIndY() {
+uint16_t CPU::operandIndY() {
     uint16_t ll = memory[rpc++];
     return memory[ll] + ry;
 }
 
-uint8_t CPU::operandRelative() {
+uint16_t CPU::operandRelative() {
     return 0;
 }
 
-uint8_t CPU::operandZpg() {
+uint16_t CPU::operandZpg() {
     uint16_t ll = memory[rpc++];
     return ll;
 }
 
-uint8_t CPU::operandZpgX() {
+uint16_t CPU::operandZpgX() {
     uint16_t ll = memory[rpc++];
     return ll + rx;
 }
 
-uint8_t CPU::operandZpgX() {
+uint16_t CPU::operandZpgX() {
     uint16_t ll = memory[rpc++];
     return ll + ry;
 }
@@ -175,41 +177,19 @@ ADC  Add Memory to Accumulator with Carry
 
 *************************************************************************************/
 void CPU::ADC(uint16_t opcode) { //add with carry
+    uint8_t operand;
     switch (opcode) {
-    case 0x69: {
-        rac += operandAbs();
-        break;
-    }
-    case 0x65: {
-        rac += operandZpg();
-        break;
-    }
-    case 0x75: {
-        rac += operandZpgX();
-        break;
-    }
-    case 0x6D: {
-        rac += operandAbs();
-        break;
-    }
-    case 0x7D: {
-        rac += operandAbsX();
-        break;
-    }
-    case 0x79: {
-        rac += operandAbsY();
-        break;
-    }
-    case 0x61: {
-        rac += operandIndX();
-        break;
-    }
-    case 0x71: {
-        rac += operandIndY();
-        break;
-    }
+    case 0x69: { operand = memory[rpc++];         break; }
+    case 0x65: { operand = memory[operandZpg()];  break; }
+    case 0x75: { operand = memory[operandZpgX()]; break; }
+    case 0x6D: { operand = memory[operandAbs()];  break; }
+    case 0x7D: { operand = memory[operandAbsX()]; break; }
+    case 0x79: { operand = memory[operandAbsY()]; break; }
+    case 0x61: { operand = memory[operandIndX()]; break; }
+    case 0x71: { operand = memory[operandIndY()]; break; }
     default: throw std::runtime_error("Incorrect dispatch: " + opcode);
     }
+    rac += operand;
 }
 
 /************************************************************************************
@@ -232,17 +212,19 @@ AND  AND Memory with Accumulator
 
 *************************************************************************************/
 void CPU::AND(uint16_t opcode) { //and (with accumulator)
+    uint8_t operand;
     switch (opcode) {
-    case 0x29: break;
-    case 0x25: break;
-    case 0x35: break;
-    case 0x2D: break;
-    case 0x3D: break;
-    case 0x39: break;
-    case 0x21: break;
-    case 0x31: break;
+    case 0x29: { operand = memory[rpc++];         break; }
+    case 0x25: { operand = memory[operandZpg()];  break; }
+    case 0x35: { operand = memory[operandZpgX()]; break; }
+    case 0x2D: { operand = memory[operandAbs()];  break; }
+    case 0x3D: { operand = memory[operandAbsX()]; break; }
+    case 0x39: { operand = memory[operandAbsY()]; break; }
+    case 0x21: { operand = memory[operandIndX()]; break; }
+    case 0x31: { operand = memory[operandIndY()]; break; }
     default: throw std::runtime_error("Incorrect dispatch: " + opcode);
     }
+    rac &= operand;
 }
 
 
@@ -263,12 +245,13 @@ ASL  Shift Left One Bit (Memory or Accumulator)
 
 *************************************************************************************/
 void CPU::ASL(uint16_t opcode) { //arithmetic shift left
+    uint8_t operand;
     switch (opcode) {
-    case 0x0A: break;
-    case 0x06: break;
-    case 0x16: break;
-    case 0x0E: break;
-    case 0x1E: break;
+    case 0x0A: { operand = memory[operandAcc()];  break; }
+    case 0x06: { operand = memory[operandZpg()];  break; }
+    case 0x16: { operand = memory[operandZpgX()]; break; }
+    case 0x0E: { operand = memory[operandAbs()];  break; }
+    case 0x1E: { operand = memory[operandAbsX()]; break; }
     default: throw std::runtime_error("Incorrect dispatch: " + opcode);
     }
 }
@@ -347,9 +330,10 @@ BIT  Test Bits in Memory with Accumulator
 
 *************************************************************************************/
 void CPU::BIT(uint16_t opcode) { //bit test
+    uint8_t operand;
     switch (opcode) {
-    case 0x24: break;
-    case 0x2C: break;
+    case 0x24: { operand = memory[operandZpg()];  break; }
+    case 0x2C: { operand = memory[operandAbs()];  break; }
     default: throw std::runtime_error("Incorrect dispatch: " + opcode);
     }
 }
@@ -564,15 +548,16 @@ CMP  Compare Memory with Accumulator
 
 *************************************************************************************/
 void CPU::CMP(uint16_t opcode) { //compare (with accumulator)
+    uint8_t operand;
     switch (opcode) {
-    case 0xC9: break;
-    case 0xC5: break;
-    case 0xD5: break;
-    case 0xCD: break;
-    case 0xDD: break;
-    case 0xD9: break;
-    case 0xC1: break;
-    case 0xD1: break;
+    case 0xC9: { operand = memory[rpc++];         break; }
+    case 0xC5: { operand = memory[operandZpg()];  break; }
+    case 0xD5: { operand = memory[operandZpgX()]; break; }
+    case 0xCD: { operand = memory[operandAbs()];  break; }
+    case 0xDD: { operand = memory[operandAbsX()]; break; }
+    case 0xD9: { operand = memory[operandAbsY()]; break; }
+    case 0xC1: { operand = memory[operandIndX()]; break; }
+    case 0xD1: { operand = memory[operandIndY()]; break; }
     default: throw std::runtime_error("Incorrect dispatch: " + opcode);
     }
 }
@@ -592,10 +577,11 @@ CPX  Compare Memory and Index X
 
 *************************************************************************************/
 void CPU::CPX(uint16_t opcode) { //compare with X
+    uint8_t operand;
     switch (opcode) {
-    case 0xE0: break;
-    case 0xE4: break;
-    case 0xEC: break;
+    case 0xE0: { operand = memory[rpc++];         break; }
+    case 0xE4: { operand = memory[operandZpg()];  break; }
+    case 0xEC: { operand = memory[operandAbs()]; break; }
     default: throw std::runtime_error("Incorrect dispatch: " + opcode);
     }
 }
@@ -615,10 +601,11 @@ CPY  Compare Memory and Index Y
 
 *************************************************************************************/
 void CPU::CPY(uint16_t opcode) { //compare with Y
+    uint8_t operand;
     switch (opcode) {
-    case 0xC0: break;
-    case 0xC4: break;
-    case 0xCC: break;
+    case 0xC0: { operand = memory[rpc++];         break; }
+    case 0xC4: { operand = memory[operandZpg()];  break; }
+    case 0xCC: { operand = memory[operandAbs()];  break; }
     default: throw std::runtime_error("Incorrect dispatch: " + opcode);
     }
 }
@@ -639,11 +626,12 @@ DEC  Decrement Memory by One
 
 *************************************************************************************/
 void CPU::DEC(uint16_t opcode) { //decrement
+    uint8_t operand;
     switch (opcode) {
-    case 0xC6: break;
-    case 0xD6: break;
-    case 0xCE: break;
-    case 0xDE: break;
+    case 0xC6: { operand = memory[operandZpg()];  break; }
+    case 0xD6: { operand = memory[operandZpgX()]; break; }
+    case 0xCE: { operand = memory[operandAbs()];  break; }
+    case 0xDE: { operand = memory[operandAbsX()]; break; }
     default: throw std::runtime_error("Incorrect dispatch: " + opcode);
     }
 }
@@ -706,17 +694,19 @@ EOR  Exclusive-OR Memory with Accumulator
 
 *************************************************************************************/
 void CPU::EOR(uint16_t opcode) { //exclusive or (with accumulator)
+    uint8_t operand;
     switch (opcode) {
-    case 0x49: break;
-    case 0x45: break;
-    case 0x55: break;
-    case 0x4D: break;
-    case 0x5D: break;
-    case 0x59: break;
-    case 0x41: break;
-    case 0x51: break;
+    case 0x49: { operand = memory[rpc++];         break; }
+    case 0x45: { operand = memory[operandZpg()];  break; }
+    case 0x55: { operand = memory[operandZpgX()]; break; }
+    case 0x4D: { operand = memory[operandAbs()];  break; }
+    case 0x5D: { operand = memory[operandAbsX()]; break; }
+    case 0x59: { operand = memory[operandAbsY()]; break; }
+    case 0x41: { operand = memory[operandIndX()]; break; }
+    case 0x51: { operand = memory[operandIndY()]; break; }
     default: throw std::runtime_error("Incorrect dispatch: " + opcode);
     }
+    rac ^= operand;
 }
 
 /************************************************************************************
@@ -735,11 +725,12 @@ INC  Increment Memory by One
 
 *************************************************************************************/
 void CPU::INC(uint16_t opcode) { //increment
+    uint8_t operand;
     switch (opcode) {
-    case 0xE6: break;
-    case 0xF6: break;
-    case 0xEE: break;
-    case 0xFE: break;
+    case 0xE6: { operand = memory[operandZpg()];  break; }
+    case 0xF6: { operand = memory[operandZpgX()]; break; }
+    case 0xEE: { operand = memory[operandAbs()];  break; }
+    case 0xFE: { operand = memory[operandAbsX()]; break; }
     default: throw std::runtime_error("Incorrect dispatch: " + opcode);
     }
 }
@@ -796,9 +787,10 @@ JMP  Jump to New Location
 
 *************************************************************************************/
 void CPU::JMP(uint16_t opcode) { //jump
+    uint16_t operand;
     switch (opcode) {
-    case 0x4C: break;
-    case 0x6C: break;
+    case 0x4C: { operand = operandAbs();         break; }
+    case 0x6C: { operand = operandInd();  break; }
     default: throw std::runtime_error("Incorrect dispatch: " + opcode);
     }
 }
@@ -843,20 +835,16 @@ LDA  Load Accumulator with Memory
 
 *************************************************************************************/
 void CPU::LDA(uint16_t opcode) { //load accumulator
+    uint8_t operand;
     switch (opcode) {
-    case 0xA9: {
-        uint16_t arg = readShort(rpc);
-        rpc += 2;
-        rac += memory[arg];
-        break;
-    }
-    case 0xA5: break;
-    case 0xB5: break;
-    case 0xAD: break;
-    case 0xBD: break;
-    case 0xB9: break;
-    case 0xA1: break;
-    case 0xB1: break;
+    case 0xA9: { operand = memory[rpc++];         break; }
+    case 0xA5: { operand = memory[operandZpg()];  break; }
+    case 0xB5: { operand = memory[operandZpgX()]; break; }
+    case 0xAD: { operand = memory[operandAbs()];  break; }
+    case 0xBD: { operand = memory[operandAbsX()]; break; }
+    case 0xB9: { operand = memory[operandAbsY()]; break; }
+    case 0xA1: { operand = memory[operandIndX()]; break; }
+    case 0xB1: { operand = memory[operandIndY()]; break; }
     default: throw std::runtime_error("Incorrect dispatch: " + opcode);
     }
 }
@@ -878,12 +866,13 @@ LDX  Load Index X with Memory
 
 *************************************************************************************/
 void CPU::LDX(uint16_t opcode) { //load X
+    uint8_t operand;
     switch (opcode) {
-    case 0xA2: break;
-    case 0xA6: break;
-    case 0xB6: break;
-    case 0xAE: break;
-    case 0xBE: break;
+    case 0xA2: { operand = memory[rpc++];         break; }
+    case 0xA6: { operand = memory[operandZpg()];  break; }
+    case 0xB6: { operand = memory[operandZpgX()]; break; }
+    case 0xAE: { operand = memory[operandAbs()];  break; }
+    case 0xBE: { operand = memory[operandAbsX()]; break; }
     default: throw std::runtime_error("Incorrect dispatch: " + opcode);
     }
 }
@@ -905,12 +894,13 @@ LDY  Load Index Y with Memory
 
 *************************************************************************************/
 void CPU::LDY(uint16_t opcode) { //load Y
+    uint8_t operand;
     switch (opcode) {
-    case 0xA0: break;
-    case 0xA4: break;
-    case 0xB4: break;
-    case 0xAC: break;
-    case 0xBC: break;
+    case 0xA0: { operand = memory[rpc++];         break; }
+    case 0xA4: { operand = memory[operandZpg()];  break; }
+    case 0xB4: { operand = memory[operandZpgX()]; break; }
+    case 0xAC: { operand = memory[operandAbs()];  break; }
+    case 0xBC: { operand = memory[operandAbsX()]; break; }
     default: throw std::runtime_error("Incorrect dispatch: " + opcode);
     }
 }
@@ -932,12 +922,13 @@ LSR  Shift One Bit Right (Memory or Accumulator)
 
 *************************************************************************************/
 void CPU::LSR(uint16_t opcode) { //logical shift right
+    uint8_t operand;
     switch (opcode) {
-    case 0x4A: break;
-    case 0x46: break;
-    case 0x56: break;
-    case 0x4E: break;
-    case 0x5E: break;
+    case 0x4A: { operand = memory[rpc++];         break; }
+    case 0x46: { operand = memory[operandZpg()];  break; }
+    case 0x56: { operand = memory[operandZpgX()]; break; }
+    case 0x4E: { operand = memory[operandAbs()];  break; }
+    case 0x5E: { operand = memory[operandAbsX()]; break; }
     default: throw std::runtime_error("Incorrect dispatch: " + opcode);
     }
 }
@@ -981,15 +972,16 @@ ORA  OR Memory with Accumulator
 
 *************************************************************************************/
 void CPU::ORA(uint16_t opcode) { //or with accumulator
+    uint8_t operand;
     switch (opcode) {
-    case 0x09: break;
-    case 0x05: break;
-    case 0x15: break;
-    case 0x0D: break;
-    case 0x1D: break;
-    case 0x19: break;
-    case 0x01: break;
-    case 0x11: break;
+    case 0x09: { operand = memory[rpc++];         break; }
+    case 0x05: { operand = memory[operandZpg()];  break; }
+    case 0x15: { operand = memory[operandZpgX()]; break; }
+    case 0x0D: { operand = memory[operandAbs()];  break; }
+    case 0x1D: { operand = memory[operandAbsX()]; break; }
+    case 0x19: { operand = memory[operandAbsY()]; break; }
+    case 0x01: { operand = memory[operandIndX()]; break; }
+    case 0x11: { operand = memory[operandIndY()]; break; }
     default: throw std::runtime_error("Incorrect dispatch: " + opcode);
     }
 }
@@ -1087,12 +1079,13 @@ ROL  Rotate One Bit Left (Memory or Accumulator)
 
 *************************************************************************************/
 void CPU::ROL(uint16_t opcode) { //rotate left
+    uint8_t operand;
     switch (opcode) {
-    case 0x2A: break;
-    case 0x26: break;
-    case 0x36: break;
-    case 0x2E: break;
-    case 0x3E: break;
+    case 0x2A: { operand = memory[rpc++];         break; }
+    case 0x26: { operand = memory[operandZpg()];  break; }
+    case 0x36: { operand = memory[operandZpgX()]; break; }
+    case 0x2E: { operand = memory[operandAbs()];  break; }
+    case 0x3E: { operand = memory[operandAbsX()]; break; }
     default: throw std::runtime_error("Incorrect dispatch: " + opcode);
     }
 }
@@ -1114,12 +1107,13 @@ ROR  Rotate One Bit Right (Memory or Accumulator)
 
 *************************************************************************************/
 void CPU::ROR(uint16_t opcode) { //rotate right
+    uint8_t operand;
     switch (opcode) {
-    case 0x6A: break;
-    case 0x66: break;
-    case 0x76: break;
-    case 0x6E: break;
-    case 0x7E: break;
+    case 0x6A: { operand = memory[rpc++];         break; }
+    case 0x66: { operand = memory[operandZpg()];  break; }
+    case 0x76: { operand = memory[operandZpgX()]; break; }
+    case 0x6E: { operand = memory[operandAbs()];  break; }
+    case 0x7E: { operand = memory[operandAbsX()]; break; }
     default: throw std::runtime_error("Incorrect dispatch: " + opcode);
     }
 }
@@ -1182,15 +1176,16 @@ SBC  Subtract Memory from Accumulator with Borrow
 
 *************************************************************************************/
 void CPU::SBC(uint16_t opcode) { //subtract with carry
+    uint8_t operand;
     switch (opcode) {
-    case 0xE9: break;
-    case 0xE5: break;
-    case 0xF5: break;
-    case 0xED: break;
-    case 0xFD: break;
-    case 0xF9: break;
-    case 0xE1: break;
-    case 0xF1: break;
+    case 0xE9: { operand = memory[rpc++];         break; }
+    case 0xE5: { operand = memory[operandZpg()];  break; }
+    case 0xF5: { operand = memory[operandZpgX()]; break; }
+    case 0xED: { operand = memory[operandAbs()];  break; }
+    case 0xFD: { operand = memory[operandAbsX()]; break; }
+    case 0xF9: { operand = memory[operandAbsY()]; break; }
+    case 0xE1: { operand = memory[operandIndX()]; break; }
+    case 0xF1: { operand = memory[operandIndY()]; break; }
     default: throw std::runtime_error("Incorrect dispatch: " + opcode);
     }
 }
@@ -1271,14 +1266,15 @@ STA  Store Accumulator in Memory
 
 *************************************************************************************/
 void CPU::STA(uint16_t opcode) { //store accumulator
+    uint8_t operand;
     switch (opcode) {
-    case 0x85: break;
-    case 0x95: break;
-    case 0x8D: break;
-    case 0x9D: break;
-    case 0x99: break;
-    case 0x81: break;
-    case 0x91: break;
+    case 0x85: { operand = memory[operandZpg()];  break; }
+    case 0x95: { operand = memory[operandZpgX()]; break; }
+    case 0x8D: { operand = memory[operandAbs()];  break; }
+    case 0x9D: { operand = memory[operandAbsX()]; break; }
+    case 0x99: { operand = memory[operandAbsY()]; break; }
+    case 0x81: { operand = memory[operandIndX()]; break; }
+    case 0x91: { operand = memory[operandIndY()]; break; }
     default: throw std::runtime_error("Incorrect dispatch: " + opcode);
     }
 }
@@ -1298,10 +1294,11 @@ STX  Store Index X in Memory
 
 *************************************************************************************/
 void CPU::STX(uint16_t opcode) { //store X
+    uint8_t operand;
     switch (opcode) {
-    case 0x86: break;
-    case 0x96: break;
-    case 0x8E: break;
+    case 0x86: { operand = memory[operandZpg()];  break; }
+    case 0x96: { operand = memory[operandZpgX()]; break; }
+    case 0x8E: { operand = memory[operandAbs()];  break; }
     default: throw std::runtime_error("Incorrect dispatch: " + opcode);
     }
 }
@@ -1321,10 +1318,11 @@ STY  Store Index Y in Memory
 
 *************************************************************************************/
 void CPU::STY(uint16_t opcode) { //store Y
+    uint8_t operand;
     switch (opcode) {
-    case 0x84: break;
-    case 0x94: break;
-    case 0x8C: break;
+    case 0x84: { operand = memory[operandZpg()];  break; }
+    case 0x94: { operand = memory[operandZpgX()]; break; }
+    case 0x8C: { operand = memory[operandAbs()];  break; }
     default: throw std::runtime_error("Incorrect dispatch: " + opcode);
     }
 }
