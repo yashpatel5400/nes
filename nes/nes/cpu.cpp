@@ -315,6 +315,8 @@ void CPU::AND(uint16_t opcode) { //and (with accumulator)
     default: throw std::runtime_error("Incorrect dispatch: " + opcode);
     }
     rac &= operand;
+    setStatusN(bool(rac & 0b10000000));
+    setStatusZ(rac == 0);
 }
 
 
@@ -344,6 +346,7 @@ void CPU::ASL(uint16_t opcode) { //arithmetic shift left
     case 0x1E: { operand = operandAbsX(); break; }
     default: throw std::runtime_error("Incorrect dispatch: " + opcode);
     }
+    setStatusC(memory[operand] & 0b10000000);
     memory[operand] = memory[operand] << 1;
 }
 
