@@ -25,8 +25,8 @@ uint16_t CPU::readShort(uint16_t addr) {
 CPU::CPU(uint8_t* memory) : memory(memory) {
     rpc = readShort(0xFFFC); // program counter starts w/ value at FFFC
     rac = 0;  // accumulator (8 bit)
-    rx  = 0;   // X register  (8 bit)
-    ry  = 0;   // Y register  (8 bit)
+    rx  = 0;  // X register  (8 bit)
+    ry  = 0;  // Y register  (8 bit)
     rsr = 0;  // status register [NV-BDIZC]  (8 bit)
     rsp = 0;  // stack pointer   (8 bit)
 }
@@ -46,32 +46,95 @@ C	....	Carry
 
 *************************************************************************************/
 
-bool CPU::srN() {
+// status getters
+
+bool CPU::getStatusN() {
     return bool(rsr & 0b10000000);
 }
 
-bool CPU::srV() {
+bool CPU::getStatusV() {
     return bool(rsr & 0b01000000);
 }
 
-bool CPU::srB() {
+bool CPU::getStatusB() {
     return bool(rsr & 0b00010000);
 }
 
-bool CPU::srD() {
+bool CPU::getStatusD() {
     return bool(rsr & 0b00001000);
 }
 
-bool CPU::srI() {
+bool CPU::getStatusI() {
     return bool(rsr & 0b00000100);
 }
 
-bool CPU::srZ() {
+bool CPU::getStatusZ() {
     return bool(rsr & 0b00000010);
 }
 
-bool CPU::srC() {
+bool CPU::getStatusC() {
     return bool(rsr & 0b00000001);
+}
+
+// status setters
+
+// which is 0-indexed from LSB
+uint8_t CPU::setBit(int which, bool bit) {
+    // setting a bit is significantly more complicated than imagined:
+    // we first have to clear the desired bit and then set it:
+    //   1111 1111
+    // & 1111 1011  <- suppose we want the 3rd bit (index=2)
+    //   ---------
+    //   1111 1011
+    // | 0000 0100  <- suppose we want to enable 3rd bit
+    //   ---------
+    //   1111 1111  <- final answer
+
+    // to actually obtain 0000 0100, we init bit and shift left by 2 (index)
+    // to obtain 1111 1011, we do:
+
+    // 1111 1011 = 1111 1000 | 0000 0011
+    // 1111 1000 is 1111 1111 shifted left  by 3 (index + 1)
+    // 0000 0011 is 1111 1111 shifted right by 6 (8 - index)
+
+    uint8_t ones = 0b11111111;
+    uint8_t leftBits = ones << (which + 1);
+    uint8_t rightBits = ones >> (8 - which);
+    uint8_t clear = leftBits | rightBits;
+
+    uint8_t paddedBit = bit;
+    paddedBit = paddedBit << which;
+    
+    rsr &= clear;
+    rsr |= paddedBit; 
+}
+
+void CPU::setStatusN(bool bit) {
+    return setBit(bit, 7);
+}
+
+void CPU::setStatusV(bool bit) {
+    return setBit(bit, 6);
+}
+
+void CPU::setStatusB(bool bit) {
+    return setBit(bit, 4);
+}
+
+void CPU::setStatusD(bool bit) {
+    return setBit(bit, 3);
+}
+
+void CPU::setStatusI(bool bit) {
+    return setBit(bit, 2);
+}
+
+void CPU::setStatusZ(bool bit) {
+    return setBit(bit, 1);
+}
+
+void CPU::setStatusC(bool bit) {
+    return setBit(bit, 0);
 }
 
 /************************************************************************************
@@ -189,7 +252,30 @@ void CPU::ADC(uint16_t opcode) { //add with carry
     case 0x71: { operand = memory[operandIndY()]; break; }
     default: throw std::runtime_error("Incorrect dispatch: " + opcode);
     }
-    rac += operand;
+
+    // http://www.righto.com/2012/12/the-6502-overflow-flag-explained.html
+    uint8_t result = 0x0; // we have to do manual adding to get the correct C and V flags
+    bool carry = getStatusC();
+    bool c6, c7;
+    for (int bit = 0; bit < 8; bit++) {
+        uint8_t selector = 1;
+        selector = selector << bit;
+        bool x = operand & selector;
+        bool y = rac     & selector;
+        bool nextBit = x ^ y ^ carry;
+        carry = bool((int(x) + int(y) + int(carry)) >= 2); // if any two are 1, then we have carry
+        if (bit == 6) {
+            c6 = carry;
+        }
+        if (bit == 7) {
+            c7 = carry;
+        }
+    }
+    
+    setStatusV(c6 ^ c7);
+    setStatusC(c7);
+    setStatusN(bool(rac & 0b10000000));
+    setStatusZ(rac == 0);
 }
 
 /************************************************************************************
@@ -245,15 +331,16 @@ ASL  Shift Left One Bit (Memory or Accumulator)
 
 *************************************************************************************/
 void CPU::ASL(uint16_t opcode) { //arithmetic shift left
-    uint8_t operand;
+    uint16_t operand;
     switch (opcode) {
-    case 0x0A: { operand = memory[operandAcc()];  break; }
-    case 0x06: { operand = memory[operandZpg()];  break; }
-    case 0x16: { operand = memory[operandZpgX()]; break; }
-    case 0x0E: { operand = memory[operandAbs()];  break; }
-    case 0x1E: { operand = memory[operandAbsX()]; break; }
+    case 0x0A: { operand = operandAcc();  break; }
+    case 0x06: { operand = operandZpg();  break; }
+    case 0x16: { operand = operandZpgX(); break; }
+    case 0x0E: { operand = operandAbs();  break; }
+    case 0x1E: { operand = operandAbsX(); break; }
     default: throw std::runtime_error("Incorrect dispatch: " + opcode);
     }
+    memory[operand] = memory[operand] << 1;
 }
 
 /************************************************************************************
