@@ -270,8 +270,12 @@ void CPU::ADC(uint16_t opcode) { //add with carry
         if (bit == 7) {
             c7 = carry;
         }
+        result = result << 1;
+        result |= nextBit;
     }
     
+    rac = result;
+
     setStatusV(c6 ^ c7);
     setStatusC(c7);
     setStatusN(bool(rac & 0b10000000));
