@@ -350,6 +350,23 @@ void CPU::ASL(uint16_t opcode) { //arithmetic shift left
     memory[operand] = memory[operand] << 1;
 }
 
+// generic helper branch function
+
+void CPU::branch(uint16_t opcode, uint16_t instOp, bool check) { //branch on carry clear
+    uint8_t operand;
+    switch (opcode) {
+    case instOp: {
+        operand = memory[rpc++];
+        break; 
+    }
+    default: throw std::runtime_error("Incorrect dispatch: " + opcode);
+    }
+
+    if (check) {
+        rpc += int8_t(operand);
+    }
+}
+
 /************************************************************************************
 
 BCC  Branch on Carry Clear
@@ -363,10 +380,7 @@ BCC  Branch on Carry Clear
 
 *************************************************************************************/
 void CPU::BCC(uint16_t opcode) { //branch on carry clear
-    switch (opcode) {
-    case 0x90: break;
-    default: throw std::runtime_error("Incorrect dispatch: " + opcode);
-    }
+    branch(opcode 0x90, !getStatusC());
 }
 
 /************************************************************************************
@@ -382,10 +396,7 @@ BCS  Branch on Carry Set
 
 *************************************************************************************/
 void CPU::BCS(uint16_t opcode) { //branch on carry set
-    switch (opcode) {
-    case 0xB0: break;
-    default: throw std::runtime_error("Incorrect dispatch: " + opcode);
-    }
+    branch(opcode 0xB0, getStatusC());
 }
 
 /************************************************************************************
@@ -401,10 +412,7 @@ BEQ  Branch on Result Zero
 
 *************************************************************************************/
 void CPU::BEQ(uint16_t opcode) { //branch on equal (zero set)
-    switch (opcode) {
-    case 0xF0: break;
-    default: throw std::runtime_error("Incorrect dispatch: " + opcode);
-    }
+    branch(opcode 0xF0, getStatusZ());
 }
 
 /************************************************************************************
@@ -445,10 +453,7 @@ BMI  Branch on Result Minus
 
 *************************************************************************************/
 void CPU::BMI(uint16_t opcode) { //branch on minus (negative set)
-    switch (opcode) {
-    case 0x30: break;
-    default: throw std::runtime_error("Incorrect dispatch: " + opcode);
-    }
+    branch(opcode 0x30, getStatusN());
 }
 
 /************************************************************************************
@@ -464,10 +469,7 @@ BNE  Branch on Result not Zero
 
 *************************************************************************************/
 void CPU::BNE(uint16_t opcode) { //branch on not equal (zero clear)
-    switch (opcode) {
-    case 0xD0: break;
-    default: throw std::runtime_error("Incorrect dispatch: " + opcode);
-    }
+    branch(opcode 0xD0, !getStatusZ());
 }
 
 /************************************************************************************
@@ -483,10 +485,7 @@ BPL  Branch on Result Plus
 
 *************************************************************************************/
 void CPU::BPL(uint16_t opcode) { //branch on plus (negative clear)
-    switch (opcode) {
-    case 0x10: break;
-    default: throw std::runtime_error("Incorrect dispatch: " + opcode);
-    }
+    branch(opcode 0x10, !getStatusN());
 }
 
 /************************************************************************************
@@ -521,10 +520,7 @@ BVC  Branch on Overflow Clear
 
 *************************************************************************************/
 void CPU::BVC(uint16_t opcode) { //branch on overflow clear
-    switch (opcode) {
-    case 0x50: break;
-    default: throw std::runtime_error("Incorrect dispatch: " + opcode);
-    }
+    branch(opcode 0x50, !getStatusV());
 }
 
 /************************************************************************************
@@ -540,10 +536,7 @@ BVS  Branch on Overflow Set
 
 *************************************************************************************/
 void CPU::BVS(uint16_t opcode) { //branch on overflow set
-    switch (opcode) {
-    case 0x70: break;
-    default: throw std::runtime_error("Incorrect dispatch: " + opcode);
-    }
+    branch(opcode 0x70, getStatusV());
 }
 
 /************************************************************************************

@@ -51,6 +51,8 @@ private:
     uint16_t operandZpgX();
     uint16_t operandZpgX();
 
+    void branch();
+
     void ADC(uint16_t opcode);
     void AND(uint16_t opcode);
     void ASL(uint16_t opcode);
