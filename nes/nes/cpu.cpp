@@ -1353,17 +1353,18 @@ STA  Store Accumulator in Memory
 
 *************************************************************************************/
 void CPU::STA(uint16_t opcode) { //store accumulator
-    uint8_t operand;
+    uint16_t operand;
     switch (opcode) {
-    case 0x85: { operand = memory[operandZpg()];  break; }
-    case 0x95: { operand = memory[operandZpgX()]; break; }
-    case 0x8D: { operand = memory[operandAbs()];  break; }
-    case 0x9D: { operand = memory[operandAbsX()]; break; }
-    case 0x99: { operand = memory[operandAbsY()]; break; }
-    case 0x81: { operand = memory[operandIndX()]; break; }
-    case 0x91: { operand = memory[operandIndY()]; break; }
+    case 0x85: { operand = operandZpg();  break; }
+    case 0x95: { operand = operandZpgX(); break; }
+    case 0x8D: { operand = operandAbs();  break; }
+    case 0x9D: { operand = operandAbsX(); break; }
+    case 0x99: { operand = operandAbsY(); break; }
+    case 0x81: { operand = operandIndX(); break; }
+    case 0x91: { operand = operandIndY(); break; }
     default: throw std::runtime_error("Incorrect dispatch: " + opcode);
     }
+    memory[operand] = rac;
 }
 
 /************************************************************************************
@@ -1381,13 +1382,14 @@ STX  Store Index X in Memory
 
 *************************************************************************************/
 void CPU::STX(uint16_t opcode) { //store X
-    uint8_t operand;
+    uint16_t operand;
     switch (opcode) {
-    case 0x86: { operand = memory[operandZpg()];  break; }
-    case 0x96: { operand = memory[operandZpgX()]; break; }
-    case 0x8E: { operand = memory[operandAbs()];  break; }
+    case 0x86: { operand = operandZpg();  break; }
+    case 0x96: { operand = operandZpgX(); break; }
+    case 0x8E: { operand = operandAbs();  break; }
     default: throw std::runtime_error("Incorrect dispatch: " + opcode);
     }
+    memory[operand] = rx;
 }
 
 /************************************************************************************
@@ -1405,13 +1407,14 @@ STY  Store Index Y in Memory
 
 *************************************************************************************/
 void CPU::STY(uint16_t opcode) { //store Y
-    uint8_t operand;
+    uint16_t operand;
     switch (opcode) {
-    case 0x84: { operand = memory[operandZpg()];  break; }
-    case 0x94: { operand = memory[operandZpgX()]; break; }
-    case 0x8C: { operand = memory[operandAbs()];  break; }
+    case 0x84: { operand = operandZpg();  break; }
+    case 0x94: { operand = operandZpgX(); break; }
+    case 0x8C: { operand = operandAbs();  break; }
     default: throw std::runtime_error("Incorrect dispatch: " + opcode);
     }
+    memory[operand] = ry;
 }
 
 /************************************************************************************
@@ -1428,7 +1431,7 @@ TAX  Transfer Accumulator to Index X
 *************************************************************************************/
 void CPU::TAX(uint16_t opcode) { //transfer accumulator to X
     switch (opcode) {
-    case 0xAA: break;
+    case 0xAA: { rx = rac; rpc++; break; }
     default: throw std::runtime_error("Incorrect dispatch: " + opcode);
     }
 }
@@ -1447,7 +1450,7 @@ TAY  Transfer Accumulator to Index Y
 *************************************************************************************/
 void CPU::TAY(uint16_t opcode) { //transfer accumulator to Y
     switch (opcode) {
-    case 0xA8: break;
+    case 0xA8: { ry = rac; rpc++; break; }
     default: throw std::runtime_error("Incorrect dispatch: " + opcode);
     }
 }
@@ -1466,7 +1469,7 @@ TSX  Transfer Stack Pointer to Index X
 *************************************************************************************/
 void CPU::TSX(uint16_t opcode) { //transfer stack pointer to X
     switch (opcode) {
-    case 0xBA: break;
+    case 0xBA: { rx = rsp; rpc++; break; }
     default: throw std::runtime_error("Incorrect dispatch: " + opcode);
     }
 }
@@ -1485,7 +1488,7 @@ TXA  Transfer Index X to Accumulator
 *************************************************************************************/
 void CPU::TXA(uint16_t opcode) { //transfer X to accumulator
     switch (opcode) {
-    case 0x8A: break;
+    case 0x8A: { rac = rx; rpc++; break; }
     default: throw std::runtime_error("Incorrect dispatch: " + opcode);
     }
 }
@@ -1504,7 +1507,7 @@ TXS  Transfer Index X to Stack Register
 *************************************************************************************/
 void CPU::TXS(uint16_t opcode) { //transfer X to stack pointer
     switch (opcode) {
-    case 0x9A: break;
+    case 0x9A: { rsp = rx; rpc++; break; }
     default: throw std::runtime_error("Incorrect dispatch: " + opcode);
     }
 }
@@ -1523,7 +1526,7 @@ TYA  Transfer Index Y to Accumulator
 *************************************************************************************/
 void CPU::TYA(uint16_t opcode) { //transfer Y to accumulator
     switch (opcode) {
-    case 0x98: break;
+    case 0x98: { rac = ry; rpc++; break; }
     default: throw std::runtime_error("Incorrect dispatch: " + opcode);
     }
 }
