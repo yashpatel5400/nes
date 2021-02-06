@@ -1291,7 +1291,7 @@ SEC  Set Carry Flag
 *************************************************************************************/
 void CPU::SEC(uint16_t opcode) { //set carry
     switch (opcode) {
-    case 0x38: break;
+    case 0x38: { setStatusC(true); rpc++; break; }
     default: throw std::runtime_error("Incorrect dispatch: " + opcode);
     }
 }
@@ -1310,7 +1310,7 @@ SED  Set Decimal Flag
 *************************************************************************************/
 void CPU::SED(uint16_t opcode) { //set decimal
     switch (opcode) {
-    case 0xF8: break;
+    case 0xF8: { setStatusD(true); rpc++; break; }
     default: throw std::runtime_error("Incorrect dispatch: " + opcode);
     }
 }
@@ -1329,7 +1329,7 @@ SEI  Set Interrupt Disable Status
 *************************************************************************************/
 void CPU::SEI(uint16_t opcode) { //set interrupt disable
     switch (opcode) {
-    case 0x78: break;
+    case 0x78: { setStatusI(true); rpc++; break; }
     default: throw std::runtime_error("Incorrect dispatch: " + opcode);
     }
 }
