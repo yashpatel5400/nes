@@ -348,17 +348,27 @@ ASL  Shift Left One Bit (Memory or Accumulator)
 
 *************************************************************************************/
 void CPU::ASL(uint16_t opcode) { //arithmetic shift left
-    uint16_t operand;
+    uint8_t operand;
+    uint16_t location;
+
     switch (opcode) {
-    case 0x0A: { operand = operandAcc();  break; }
-    case 0x06: { operand = operandZpg();  break; }
-    case 0x16: { operand = operandZpgX(); break; }
-    case 0x0E: { operand = operandAbs();  break; }
-    case 0x1E: { operand = operandAbsX(); break; }
+    case 0x0A: { operand = rac;                                        break; }
+    case 0x06: { location = operandZpg();  operand = memory[location]; break; }
+    case 0x16: { location = operandZpgX(); operand = memory[location]; break; }
+    case 0x0E: { location = operandAbs();  operand = memory[location]; break; }
+    case 0x1E: { location = operandAbsX(); operand = memory[location]; break; }
     default: throw std::runtime_error("Incorrect dispatch: " + opcode);
     }
-    setStatusC(memory[operand] & 0b10000000);
-    memory[operand] = memory[operand] << 1;
+
+    setStatusC((bool)(result & 0b10000000));
+    uint8_t result = operand << 1;
+    setValueN(result);
+    setValueZ(result);
+
+    switch (opcode) {
+    case 0x0A: { rac = result;               break; }
+    default:   { memory[location] = result;  break; }
+    }
 }
 
 // generic helper branch function
@@ -847,6 +857,8 @@ void CPU::INC(uint16_t opcode) { //increment
     case 0xFE: { operand = memory[operandAbsX()]; break; }
     default: throw std::runtime_error("Incorrect dispatch: " + opcode);
     }
+    rx++;
+    setValueZN(rx);
 }
 
 /************************************************************************************
@@ -885,6 +897,8 @@ void CPU::INY(uint16_t opcode) { //increment Y
     case 0xC8: break;
     default: throw std::runtime_error("Incorrect dispatch: " + opcode);
     }
+    ry++;
+    setValueZN(ry);
 }
 
 /************************************************************************************
@@ -1043,13 +1057,25 @@ LSR  Shift One Bit Right (Memory or Accumulator)
 *************************************************************************************/
 void CPU::LSR(uint16_t opcode) { //logical shift right
     uint8_t operand;
+    uint16_t location;
+
     switch (opcode) {
-    case 0x4A: { operand = memory[rpc++];         break; }
-    case 0x46: { operand = memory[operandZpg()];  break; }
-    case 0x56: { operand = memory[operandZpgX()]; break; }
-    case 0x4E: { operand = memory[operandAbs()];  break; }
-    case 0x5E: { operand = memory[operandAbsX()]; break; }
+    case 0x4A: { operand = rac;                                        break; }
+    case 0x46: { location = operandZpg();  operand = memory[location]; break; }
+    case 0x56: { location = operandZpgX(); operand = memory[location]; break; }
+    case 0x4E: { location = operandAbs();  operand = memory[location]; break; }
+    case 0x5E: { location = operandAbsX(); operand = memory[location]; break; }
     default: throw std::runtime_error("Incorrect dispatch: " + opcode);
+    }
+
+    setStatusC((bool)(result & 0b00000001));
+    uint8_t result = operand >> 1;
+    setValueN(result);
+    setValueZ(result);
+
+    switch (opcode) {
+    case 0x4A: { rac = result;               break; }
+    default:   { memory[location] = result;  break; }
     }
 }
 
