@@ -30,13 +30,21 @@ public:
 
 private: 
 	// SR Flags (bit 7 to bit 0) carry different semantics -- functions to disentangle
-    bool srN();
-    bool srV();
-    bool srB();
-    bool srD();
-    bool srI();
-    bool srZ();
-    bool srC();
+    bool getStatusN();
+    bool getStatusV();
+    bool getStatusB();
+    bool getStatusD();
+    bool getStatusI();
+    bool getStatusZ();
+    bool getStatusC();
+    uint8_t setBit(int which, bool bit);
+    void setStatusN(bool bit);
+    void setStatusV(bool bit);
+    void setStatusB(bool bit);
+    void setStatusD(bool bit);
+    void setStatusI(bool bit);
+    void setStatusZ(bool bit);
+    void setStatusC(bool bit);
 
     uint16_t operandAcc();
     uint16_t operandAbs();

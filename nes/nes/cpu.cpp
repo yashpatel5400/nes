@@ -137,6 +137,19 @@ void CPU::setStatusC(bool bit) {
     return setBit(bit, 0);
 }
 
+// semantic setting of registers
+void CPU::setValueZ(uint8_t value) {
+    setStatusZ(value == 0);
+}
+
+void CPU::setValueN(uint8_t value) {
+    setStatusN(bool(value & 0b10000000));
+}
+
+void CPU::setValueZN(uint8_t value) {
+    setStatusN(bool(value & 0b10000000));
+}
+
 /************************************************************************************
 
 NOTE: The 6502 has 16 address lines, meaning it has a 16-bit addressable space, which
@@ -278,8 +291,7 @@ void CPU::ADC(uint16_t opcode) { //add with carry
 
     setStatusV(c6 ^ c7);
     setStatusC(c7);
-    setStatusN(bool(rac & 0b10000000));
-    setStatusZ(rac == 0);
+    setValueZN(rac);
 }
 
 /************************************************************************************
@@ -315,8 +327,7 @@ void CPU::AND(uint16_t opcode) { //and (with accumulator)
     default: throw std::runtime_error("Incorrect dispatch: " + opcode);
     }
     rac &= operand;
-    setStatusN(bool(rac & 0b10000000));
-    setStatusZ(rac == 0);
+    setValueZN(rac);
 }
 
 
@@ -615,12 +626,18 @@ void CPU::CLV(uint16_t opcode) { //clear overflow
     }
 }
 
+void CPU::compare(uint8_t reg, uint8_t mem) { // generic compare and sets flags
+    uint8_t result = reg - mem;
+    setStatusC(result >= 0);
+    setValueZN(result);
+}
+
 /************************************************************************************
 
 CMP  Compare Memory with Accumulator
 
      A - M                            N Z C I D V
-                                    + + + - - -
+                                      + + + - - -
 
      addressing    assembler    opc  bytes  cyles
      --------------------------------------------
@@ -647,6 +664,7 @@ void CPU::CMP(uint16_t opcode) { //compare (with accumulator)
     case 0xD1: { operand = memory[operandIndY()]; break; }
     default: throw std::runtime_error("Incorrect dispatch: " + opcode);
     }
+    compare(rax, operand);
 }
 
 /************************************************************************************
@@ -671,6 +689,7 @@ void CPU::CPX(uint16_t opcode) { //compare with X
     case 0xEC: { operand = memory[operandAbs()]; break; }
     default: throw std::runtime_error("Incorrect dispatch: " + opcode);
     }
+    compare(rx, operand);
 }
 
 /************************************************************************************
@@ -695,6 +714,7 @@ void CPU::CPY(uint16_t opcode) { //compare with Y
     case 0xCC: { operand = memory[operandAbs()];  break; }
     default: throw std::runtime_error("Incorrect dispatch: " + opcode);
     }
+    compare(ry, operand);
 }
 
 /************************************************************************************
@@ -715,12 +735,14 @@ DEC  Decrement Memory by One
 void CPU::DEC(uint16_t opcode) { //decrement
     uint8_t operand;
     switch (opcode) {
-    case 0xC6: { operand = memory[operandZpg()];  break; }
-    case 0xD6: { operand = memory[operandZpgX()]; break; }
-    case 0xCE: { operand = memory[operandAbs()];  break; }
-    case 0xDE: { operand = memory[operandAbsX()]; break; }
+    case 0xC6: { operand = operandZpg();  break; }
+    case 0xD6: { operand = operandZpgX(); break; }
+    case 0xCE: { operand = operandAbs();  break; }
+    case 0xDE: { operand = operandAbsX(); break; }
     default: throw std::runtime_error("Incorrect dispatch: " + opcode);
     }
+    memory[operand]--;
+    setValueZN(memory[operand]);
 }
 
 /************************************************************************************
@@ -740,6 +762,8 @@ void CPU::DEX(uint16_t opcode) { //decrement X
     case 0xCA: break;
     default: throw std::runtime_error("Incorrect dispatch: " + opcode);
     }
+    rx--;
+    setValueZN(rx);
 }
 
 /************************************************************************************
@@ -759,6 +783,8 @@ void CPU::DEY(uint16_t opcode) { //decrement Y
     case 0x88: break;
     default: throw std::runtime_error("Incorrect dispatch: " + opcode);
     }
+    ry--;
+    setValueZN(ry);
 }
 
 /************************************************************************************
@@ -794,6 +820,7 @@ void CPU::EOR(uint16_t opcode) { //exclusive or (with accumulator)
     default: throw std::runtime_error("Incorrect dispatch: " + opcode);
     }
     rac ^= operand;
+    setValueZN(rac);
 }
 
 /************************************************************************************
