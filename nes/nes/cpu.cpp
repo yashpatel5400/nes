@@ -49,31 +49,31 @@ C	....	Carry
 // status getters
 
 bool CPU::getStatusN() {
-    return bool(rsr & 0b10000000);
+    return (bool)(rsr & 0b10000000);
 }
 
 bool CPU::getStatusV() {
-    return bool(rsr & 0b01000000);
+    return (bool)(rsr & 0b01000000);
 }
 
 bool CPU::getStatusB() {
-    return bool(rsr & 0b00010000);
+    return (bool)(rsr & 0b00010000);
 }
 
 bool CPU::getStatusD() {
-    return bool(rsr & 0b00001000);
+    return (bool)(rsr & 0b00001000);
 }
 
 bool CPU::getStatusI() {
-    return bool(rsr & 0b00000100);
+    return (bool)(rsr & 0b00000100);
 }
 
 bool CPU::getStatusZ() {
-    return bool(rsr & 0b00000010);
+    return (bool)(rsr & 0b00000010);
 }
 
 bool CPU::getStatusC() {
-    return bool(rsr & 0b00000001);
+    return (bool)(rsr & 0b00000001);
 }
 
 // status setters
@@ -143,11 +143,11 @@ void CPU::setValueZ(uint8_t value) {
 }
 
 void CPU::setValueN(uint8_t value) {
-    setStatusN(bool(value & 0b10000000));
+    setStatusN((bool)(value & 0b10000000));
 }
 
 void CPU::setValueZN(uint8_t value) {
-    setStatusN(bool(value & 0b10000000));
+    setStatusN((bool)(value & 0b10000000));
 }
 
 /************************************************************************************
@@ -276,7 +276,7 @@ void CPU::ADC(uint16_t opcode) { //add with carry
         bool x = operand & selector;
         bool y = rac     & selector;
         bool nextBit = x ^ y ^ carry;
-        carry = bool((int(x) + int(y) + int(carry)) >= 2); // if any two are 1, then we have carry
+        carry = (bool)((int(x) + int(y) + int(carry)) >= 2); // if any two are 1, then we have carry
         if (bit == 6) {
             c6 = carry;
         }
@@ -961,6 +961,8 @@ void CPU::LDA(uint16_t opcode) { //load accumulator
     case 0xB1: { operand = memory[operandIndY()]; break; }
     default: throw std::runtime_error("Incorrect dispatch: " + opcode);
     }
+    rac = operand;
+    setValueZN(rac);
 }
 
 /************************************************************************************
@@ -989,6 +991,8 @@ void CPU::LDX(uint16_t opcode) { //load X
     case 0xBE: { operand = memory[operandAbsX()]; break; }
     default: throw std::runtime_error("Incorrect dispatch: " + opcode);
     }
+    rx = operand;
+    setValueZN(rx);
 }
 
 /************************************************************************************
@@ -1017,6 +1021,8 @@ void CPU::LDY(uint16_t opcode) { //load Y
     case 0xBC: { operand = memory[operandAbsX()]; break; }
     default: throw std::runtime_error("Incorrect dispatch: " + opcode);
     }
+    ry = operand;
+    setValueZN(ry);
 }
 
 /************************************************************************************
@@ -1098,6 +1104,8 @@ void CPU::ORA(uint16_t opcode) { //or with accumulator
     case 0x11: { operand = memory[operandIndY()]; break; }
     default: throw std::runtime_error("Incorrect dispatch: " + opcode);
     }
+    rac |= operand;
+    setValueZN(rac);
 }
 
 /************************************************************************************
@@ -1194,13 +1202,26 @@ ROL  Rotate One Bit Left (Memory or Accumulator)
 *************************************************************************************/
 void CPU::ROL(uint16_t opcode) { //rotate left
     uint8_t operand;
+    uint16_t location;
     switch (opcode) {
-    case 0x2A: { operand = memory[rpc++];         break; }
-    case 0x26: { operand = memory[operandZpg()];  break; }
-    case 0x36: { operand = memory[operandZpgX()]; break; }
-    case 0x2E: { operand = memory[operandAbs()];  break; }
-    case 0x3E: { operand = memory[operandAbsX()]; break; }
+    case 0x2A: { operand = rac;                   break; }
+    case 0x26: { location = operandZpg();  operand = memory[location];  break; }
+    case 0x36: { location = operandZpgX(); operand = memory[location]; break; }
+    case 0x2E: { location = operandAbs();  operand = memory[location];  break; }
+    case 0x3E: { location = operandAbsX(); operand = memory[location]; break; }
     default: throw std::runtime_error("Incorrect dispatch: " + opcode);
+    }
+
+    uint8_t carry = getStatusC();
+    setStatusC((bool)(operand & 0b10000000));
+    
+    uint8_t result = operand << 1;
+    result |= carry;
+    setValueZN(result);
+
+    switch (opcode) {
+    case 0x2A: { rac = result;               break; }
+    default:   { memory[location] = result;  break; }
     }
 }
 
@@ -1222,13 +1243,27 @@ ROR  Rotate One Bit Right (Memory or Accumulator)
 *************************************************************************************/
 void CPU::ROR(uint16_t opcode) { //rotate right
     uint8_t operand;
+    uint16_t location;
     switch (opcode) {
-    case 0x6A: { operand = memory[rpc++];         break; }
-    case 0x66: { operand = memory[operandZpg()];  break; }
-    case 0x76: { operand = memory[operandZpgX()]; break; }
-    case 0x6E: { operand = memory[operandAbs()];  break; }
-    case 0x7E: { operand = memory[operandAbsX()]; break; }
+    case 0x6A: { operand = rac;                   break; }
+    case 0x66: { location = operandZpg();  operand = memory[location];  break; }
+    case 0x76: { location = operandZpgX(); operand = memory[location]; break; }
+    case 0x6E: { location = operandAbs();  operand = memory[location];  break; }
+    case 0x7E: { location = operandAbsX(); operand = memory[location]; break; }
     default: throw std::runtime_error("Incorrect dispatch: " + opcode);
+    }
+
+    uint8_t carry = getStatusC();
+    carry = carry << 7;
+    setStatusC((bool)(operand & 0b00000001));
+    
+    uint8_t result = operand >> 1;
+    result |= carry;
+    setValueZN(result);
+
+    switch (opcode) {
+    case 0x6A: { rac = results;              break; }
+    default:   { memory[location] = result;  break; }
     }
 }
 
